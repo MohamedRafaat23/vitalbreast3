@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/core/doctors/bodyDoctorScreen.dart';
+import 'package:vitalbreast3/core/doctors/body_doctor_screen.dart';
 import 'package:vitalbreast3/core/doctors/filtered_location.dart';
 import 'package:vitalbreast3/screens/ChatBot/chat_bot.dart';
-import 'package:vitalbreast3/screens/home/storiesScreen.dart';
+import 'package:vitalbreast3/screens/home/stories_screen.dart';
 import 'package:vitalbreast3/screens/profile/profile_screan.dart';
 import 'package:vitalbreast3/screens/scanner/scanner.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
