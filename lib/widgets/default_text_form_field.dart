@@ -30,7 +30,7 @@ class DefaultTextFormField extends StatelessWidget {
         return null;
       },
       decoration: InputDecoration(
-        isDense: true,
+        // isDense: true,
         hintText: hintText,
         hintStyle: TextStyle(
           fontSize: 11,

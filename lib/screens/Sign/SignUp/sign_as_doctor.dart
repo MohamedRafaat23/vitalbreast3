@@ -72,28 +72,28 @@ class _DoctorCreationState extends State<DoctorCreation> {
 
                             // PrefixIconImageName: 'email',
                           ),
-                          SizedBox(height: 15),
+                          SizedBox(height: 20),
                           DefaultTextFormField(
                             controller: emailcontroller,
                             hintText: 'Email',
 
                             // PrefixIconImageName: 'email',
                           ),
-                          SizedBox(height: 15),
+                          SizedBox(height: 20),
                           DefaultTextFormField(
                             controller: passwordcontroller,
                             hintText: 'Password',
 
                             // PrefixIconImageName: 'email',
                           ),
-                          SizedBox(height: 15),
+                          SizedBox(height: 20),
                           DefaultTextFormField(
                             controller: mobilenumbercontroller,
                             hintText: 'Mobile Number',
 
                             // PrefixIconImageName: 'email',
                           ),
-                          SizedBox(height: 15),
+                          SizedBox(height: 20),
                           DefaultTextFormField(
                             controller: dateofbirthcontroller,
                             hintText: 'Date Of Birth',
@@ -101,7 +101,7 @@ class _DoctorCreationState extends State<DoctorCreation> {
                             // PrefixIconImageName: 'email',
                           ),
 
-                          SizedBox(height: 15),
+                          SizedBox(height: 20),
                           CustomElevatedButton(
                             text: ("Next "),
                             onTap: () {
