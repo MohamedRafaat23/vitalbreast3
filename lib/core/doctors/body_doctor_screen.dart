@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/core/doctors/DoctorCard.dart';
+import 'package:vitalbreast3/core/doctors/doctor_card.dart';
 
 class BodyDoctorScreen extends StatelessWidget {
   const BodyDoctorScreen({super.key});
