@@ -268,6 +268,7 @@ class _CancelAppointmentScreenState extends State<CancelAppointmentScreen> {
                             ),
                           ),
                           child: const Text('Yes'),
+                          
                         ),
                       ),
                     ],

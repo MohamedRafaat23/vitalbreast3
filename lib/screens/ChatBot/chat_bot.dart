@@ -198,11 +198,20 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   IconButton(
                     icon: Icon(
-                      Icons.play_arrow_outlined,
+                      Icons.send,
                       color: Colors.pink[400],
                     ),
                     onPressed: () {
-                      // Send message logic
+                      if (_controller.text.trim().isNotEmpty) {
+                        setState(() {
+                          _messages.add(Message(
+                            text: _controller.text,
+                            isUser: true,
+                          ));
+                          // Clear the text field after sending
+                          _controller.clear();
+                        });
+                      }
                     },
                   ),
                   IconButton(

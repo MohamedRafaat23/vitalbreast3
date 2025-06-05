@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/core/doctors/body_doctor_screen.dart';
-import 'package:vitalbreast3/screens/ChatBot/chat_bot.dart';
 import 'package:vitalbreast3/screens/home/stories_screen.dart';
 import 'package:vitalbreast3/screens/profile/profile_screan.dart';
-import 'package:vitalbreast3/screens/scanner/scanner.dart';
-
 class LayoutMainScreen extends StatefulWidget {
   const LayoutMainScreen({super.key});
   static const String routeName = '/layout_main_screen';
@@ -47,14 +43,7 @@ class _LayoutMainScreenState extends State<LayoutMainScreen> {
             ),
           ],
         ),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.location_on, color: Colors.grey),
-        //     onPressed: () {
-        //       context.push(const DoctorListingScreen());
-        //     },
-        //   ),
-        // ],
+       
       ),
       body: screenList[index],
       bottomNavigationBar: BottomNavigationBar(
@@ -77,10 +66,10 @@ class _LayoutMainScreenState extends State<LayoutMainScreen> {
             icon: Icon(Icons.medical_services),
             label: 'Doctors',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.document_scanner_outlined),
-            label: 'Scanner',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.document_scanner_outlined),
+          //   label: 'Scanner',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.reddit_outlined),
             label: 'Chatbot',
@@ -96,9 +85,6 @@ class _LayoutMainScreenState extends State<LayoutMainScreen> {
 
   List screenList = [
     const StoriesScreen(),
-    const BodyDoctorScreen(),
-    const ScannerScreen(),
-    const ChatScreen(),
     const ProfileScreen(),
   ];
 }
