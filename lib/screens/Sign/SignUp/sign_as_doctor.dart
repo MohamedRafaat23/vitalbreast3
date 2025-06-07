@@ -4,9 +4,10 @@ import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
 import 'package:vitalbreast3/core/models/user.dart';
 import 'package:vitalbreast3/screens/Sign/SignUp/complete_signing.dart';
 import 'package:vitalbreast3/screens/Sign/SignUp/sign_up_view.dart';
+import 'package:vitalbreast3/widgets/back_button.dart';
 import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
 import 'package:vitalbreast3/widgets/default_text_form_field.dart';
-import 'package:vitalbreast3/widgets/back_button.dart';
+
 import '../../../core/data/local/cashe_helper.dart';
 import '../../../core/network/api_constant.dart';
 
@@ -25,49 +26,6 @@ class _DoctorCreationState extends State<DoctorCreation> {
   final TextEditingController dateofbirthcontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-
-  Future<void> getData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final response = await DioHelper.dio.get(
-        ApiConstant.signup,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer ${CasheHelper.getData(key: 'token')}',
-          },
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        print('Data received: ${response.data}');
-      }
-    } on DioException catch (e) {
-      String errorMessage = 'An error occurred while fetching data';
-      if (e.response?.data != null && e.response?.data['message'] != null) {
-        errorMessage = e.response?.data['message'];
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('An unexpected error occurred')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
 
   Future<void> signUp() async {
     if (!_formKey.currentState!.validate()) {
@@ -88,19 +46,15 @@ class _DoctorCreationState extends State<DoctorCreation> {
         'role': 'doctor',
       });
 
-      final response = await DioHelper.dio.post(
-        ApiConstant.signup,
-        data: form,
-      );
+      final response = await DioHelper.dio.post(ApiConstant.signup, data: form);
 
       if (response.statusCode == 201) {
         user = User.fromJson(response.data);
+        CasheHelper.saveData(key: 'token', value: user!.token);
         if (mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const DoctorInformation(),
-            ),
+            MaterialPageRoute(builder: (context) => const DoctorInformation()),
           );
         }
       }
@@ -110,9 +64,9 @@ class _DoctorCreationState extends State<DoctorCreation> {
         errorMessage = e.response?.data['message'];
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     } catch (e) {
       if (mounted) {
@@ -139,10 +93,7 @@ class _DoctorCreationState extends State<DoctorCreation> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.white,
-              Color(0xFFF48FB1),
-            ],
+            colors: [Colors.white, Color(0xFFF48FB1)],
           ),
         ),
         child: SafeArea(
@@ -154,12 +105,13 @@ class _DoctorCreationState extends State<DoctorCreation> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: BackButtonn(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SignUpView(),
-                        ),
-                      ),
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpView(),
+                            ),
+                          ),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -228,4 +180,3 @@ class _DoctorCreationState extends State<DoctorCreation> {
     super.dispose();
   }
 }
-
