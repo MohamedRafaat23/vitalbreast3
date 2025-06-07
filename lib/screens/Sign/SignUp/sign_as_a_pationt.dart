@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:vitalbreast3/screens/Sign/SignUp/sign_up_succ.dart';
 import 'package:vitalbreast3/screens/Sign/SignUp/sign_up_view.dart';
-import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
+import 'package:vitalbreast3/widgets/back_button.dart';
 import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
 import 'package:vitalbreast3/widgets/default_text_form_field.dart';
-import 'package:vitalbreast3/widgets/back_button.dart';
+
+import '../../../core/data/local/cashe_helper.dart';
 import '../../../core/data/remote/dio_helper.dart';
 import '../../../core/models/user.dart';
 import '../../../core/network/api_constant.dart';
-import '../../../core/data/local/cashe_helper.dart';
 
 class PationCreation extends StatefulWidget {
   const PationCreation({super.key});
@@ -25,7 +25,7 @@ class _PationCreationState extends State<PationCreation> {
   TextEditingController mobilenumbercontroller = TextEditingController();
   TextEditingController dateofbirthcontroller = TextEditingController();
   TextEditingController citycontroller = TextEditingController();
-  
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
@@ -56,9 +56,9 @@ class _PationCreationState extends State<PationCreation> {
         errorMessage = e.response?.data['message'];
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     } catch (e) {
       if (mounted) {
@@ -96,19 +96,14 @@ class _PationCreationState extends State<PationCreation> {
         'role': 'patient',
       });
 
-      final response = await DioHelper.dio.post(
-        ApiConstant.signup,
-        data: form,
-      );
+      final response = await DioHelper.dio.post(ApiConstant.signup, data: form);
 
       if (response.statusCode == 201) {
         user = User.fromJson(response.data);
         if (mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const SignUPSuccess(),
-            ),
+            MaterialPageRoute(builder: (context) => const SignUPSuccess()),
           );
         }
       }
@@ -118,9 +113,9 @@ class _PationCreationState extends State<PationCreation> {
         errorMessage = e.response?.data['message'];
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     } catch (e) {
       if (mounted) {
@@ -147,10 +142,7 @@ class _PationCreationState extends State<PationCreation> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.white,
-              Color(0xFFF48FB1),
-            ],
+            colors: [Colors.white, Color(0xFFF48FB1)],
           ),
         ),
         child: SafeArea(
@@ -162,12 +154,13 @@ class _PationCreationState extends State<PationCreation> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: BackButtonn(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SignUpView(),
-                        ),
-                      ),
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpView(),
+                            ),
+                          ),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -214,8 +207,7 @@ class _PationCreationState extends State<PationCreation> {
                           text: _isLoading ? "Signing up..." : "Sign Up",
                           onTap: _isLoading ? null : signUp,
                         ),
-                         const SizedBox(height: 50),
-                     
+                        const SizedBox(height: 50),
                       ],
                     ),
                   ),
@@ -239,4 +231,3 @@ class _PationCreationState extends State<PationCreation> {
     super.dispose();
   }
 }
-
