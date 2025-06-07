@@ -1,10 +1,72 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
+import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
+import 'package:vitalbreast3/core/network/api_constant.dart';
 import 'package:vitalbreast3/screens/view/doctor_view.dart';
 import 'package:vitalbreast3/screens/view/welcome_view.dart';
 import 'package:vitalbreast3/widgets/back_button.dart';
 
-class StoryView extends StatelessWidget {
+class StoryView extends StatefulWidget {
   const StoryView({super.key});
+
+  @override
+  State<StoryView> createState() => _StoryViewState();
+}
+
+class _StoryViewState extends State<StoryView> {
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  Future<void> getData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await DioHelper.dio.get(
+        ApiConstant.story,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${CasheHelper.getData(key: 'token')}',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Handle successful response
+        print('Data received: ${response.data}');
+        // You can parse the response data here
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'An error occurred while fetching data';
+      if (e.response?.data != null && e.response?.data['message'] != null) {
+        errorMessage = e.response?.data['message'];
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An unexpected error occurred')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
