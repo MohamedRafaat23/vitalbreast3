@@ -35,7 +35,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
         ApiConstant.story,
         options: Options(
           headers: {
-            'Authorization': 'Bearer ${CasheHelper.getData(key: 'token')}',
+            'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
           },
         ),
       );

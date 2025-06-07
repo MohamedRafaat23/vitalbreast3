@@ -40,7 +40,7 @@ class _PationCreationState extends State<PationCreation> {
         ApiConstant.signup,
         options: Options(
           headers: {
-            'Authorization': 'Bearer ${CasheHelper.getData(key: 'token')}',
+            'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
           },
         ),
       );

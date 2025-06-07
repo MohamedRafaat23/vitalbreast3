@@ -44,7 +44,7 @@ class _ProfileScreenState extends State<MyProfileScreen> {
         '${ApiConstant.baseUrl}/accounts/auth/users/me/',
         options: Options(
           headers: {
-            'Authorization': 'Bearer ${CasheHelper.getData(key: 'token')}',
+            'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
           },
         ),
       );
@@ -296,7 +296,7 @@ class _ProfileScreenState extends State<MyProfileScreen> {
                                             options: Options(
                                               headers: {
                                                 'Authorization':
-                                                    'Bearer ${CasheHelper.getData(key: 'token')}',
+                                                    'Token ${CasheHelper.getData(key: 'token')}',
                                               },
                                             ),
                                           );
