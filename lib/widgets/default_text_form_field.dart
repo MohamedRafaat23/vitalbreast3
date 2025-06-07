@@ -6,11 +6,14 @@ class DefaultTextFormField extends StatelessWidget {
     super.key,
     required this.controller,
     required this.hintText,
-    
-    // this.PrefixIconImageName,
-   });
+    this.validator,
+    this.obscureText = false,
+  });
+  
   TextEditingController controller;
   String hintText;
+  bool obscureText;
+  String? Function(String?)? validator;
   // متغير لتمثيل الشهادة المرفوعة (قد يكون اسم الملف أو أي معلومات أخرى)
    TextEditingController certficate = TextEditingController();
   // متغير لتمثيل الشهادة المرفوعة (قد يكون اسم الملف أو أي معلومات أخرى)
@@ -21,16 +24,15 @@ class DefaultTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      
       controller: controller,
-      validator: (value) {
-        if (value == "") {
-          return "required";
+      obscureText: obscureText,
+      validator: validator ?? (value) {
+        if (value == null || value.isEmpty) {
+          return "This field is required";
         }
         return null;
       },
       decoration: InputDecoration(
-        // isDense: true,
         hintText: hintText,
         hintStyle: TextStyle(
           fontSize: 11,
@@ -49,13 +51,10 @@ class DefaultTextFormField extends StatelessWidget {
           borderSide: BorderSide(width: 1.1, color: Colors.red),
           borderRadius: BorderRadius.circular(20),
         ),
-        errorBorder:   OutlineInputBorder(
+        errorBorder: OutlineInputBorder(
           borderSide: BorderSide(width: .5, color: Colors.redAccent),
           borderRadius: BorderRadius.circular(20),
         ),
-
-      
-        
       ),
     );
   }
