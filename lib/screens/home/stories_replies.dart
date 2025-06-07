@@ -30,21 +30,21 @@ class _RepliesScreenState extends State<RepliesScreen> {
   List<Reply> replies = [
     Reply(
       name: 'Rahma Ali',
-      avatarUrl: 'assets/avatar1.jpg',
+      avatarUrl: 'assets/avatar1.png',
       timeAgo: '2 hours ago',
       content:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     ),
     Reply(
       name: 'Rahma Ali',
-      avatarUrl: 'assets/avatar2.jpg',
+      avatarUrl: 'assets/avatar2.png',
       timeAgo: '2 hours ago',
       content:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     ),
     Reply(
       name: 'Rahma Ali',
-      avatarUrl: 'assets/avatar1.jpg',
+      avatarUrl: 'assets/avatar1.png',
       timeAgo: '2 hours ago',
       content:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -57,7 +57,7 @@ class _RepliesScreenState extends State<RepliesScreen> {
         replies.add(
           Reply(
             name: 'Me',
-            avatarUrl: 'assets/avatar_me.jpg',
+            avatarUrl: 'assets/avatar_me.png',
             timeAgo: 'just now',
             content: _reviewController.text,
           ),
@@ -86,9 +86,10 @@ class _RepliesScreenState extends State<RepliesScreen> {
         title: const Text(
           'Replies',
           style: TextStyle(
-              color: Color(0xffFA7CA5),
-              fontSize: 22,
-              fontWeight: FontWeight.bold),
+            color: Color(0xffFA7CA5),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -118,11 +119,7 @@ class _RepliesScreenState extends State<RepliesScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(
-                  color: Colors.grey,
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                ),
+                BoxShadow(color: Colors.grey, spreadRadius: 1, blurRadius: 5),
               ],
             ),
             child: Row(
@@ -140,7 +137,9 @@ class _RepliesScreenState extends State<RepliesScreen> {
                       filled: true,
                       fillColor: Colors.grey[100],
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                 ),
@@ -197,9 +196,7 @@ class ReplyCard extends StatelessWidget {
               const CircleAvatar(
                 radius: 20,
                 backgroundColor: Color(0xffFFD1E2),
-                child: ClipOval(
-                  child: Icon(Icons.person, color: Colors.white),
-                ),
+                child: ClipOval(child: Icon(Icons.person, color: Colors.white)),
               ),
               const SizedBox(width: 10),
               Column(
@@ -217,18 +214,12 @@ class ReplyCard extends StatelessWidget {
                     children: [
                       Text(
                         'added a reply',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
                       ),
                       const SizedBox(width: 5),
                       Text(
                         reply.timeAgo,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
                       ),
                     ],
                   ),
@@ -239,9 +230,10 @@ class ReplyCard extends StatelessWidget {
                 onTap: onLikePressed,
                 child: Icon(
                   reply.isLiked ? Icons.favorite : Icons.favorite_border,
-                  color: reply.isLiked
-                      ? const Color(0xffFA7CA5)
-                      : Colors.grey[400],
+                  color:
+                      reply.isLiked
+                          ? const Color(0xffFA7CA5)
+                          : Colors.grey[400],
                   size: 20,
                 ),
               ),
@@ -251,10 +243,7 @@ class ReplyCard extends StatelessWidget {
           // Reply content
           Text(
             reply.content,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[800],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[800]),
           ),
         ],
       ),

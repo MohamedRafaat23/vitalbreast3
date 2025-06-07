@@ -86,7 +86,7 @@ class StoryView extends StatelessWidget {
                       left: 60,
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundImage: AssetImage('assets/3.jpg'),
+                        backgroundImage: AssetImage('assets/3.png'),
                       ),
                     ),
                   ],

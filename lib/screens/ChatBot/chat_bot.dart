@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class Message {
   final String text;
   final bool isUser;
@@ -95,14 +94,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     'Online',
                     style: TextStyle(color: Colors.green, fontSize: 12),
                   ),
-                  
                 ],
               ),
-               Container(
-            height: 1,
-      
-            color: const Color.fromARGB(255, 116, 116, 116),
-          ),
+              Container(
+                height: 1,
+
+                color: const Color.fromARGB(255, 116, 116, 116),
+              ),
             ],
           ),
         ],
@@ -149,10 +147,9 @@ class _ChatScreenState extends State<ChatScreen> {
             if (message.isUser)
               const CircleAvatar(
                 radius: 16,
-                backgroundImage:
-                AssetImage("assets/3.jpg")
+                backgroundImage: AssetImage("assets/3.png"),
                 //  NetworkImage(
-                //   'https://randomuser.me/api/portraits/women/17.jpg',
+                //   'https://randomuser.me/api/portraits/women/17.png',
                 // ),
               ),
           ],
@@ -197,17 +194,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(
-                      Icons.send,
-                      color: Colors.pink[400],
-                    ),
+                    icon: Icon(Icons.send, color: Colors.pink[400]),
                     onPressed: () {
                       if (_controller.text.trim().isNotEmpty) {
                         setState(() {
-                          _messages.add(Message(
-                            text: _controller.text,
-                            isUser: true,
-                          ));
+                          _messages.add(
+                            Message(text: _controller.text, isUser: true),
+                          );
                           // Clear the text field after sending
                           _controller.clear();
                         });

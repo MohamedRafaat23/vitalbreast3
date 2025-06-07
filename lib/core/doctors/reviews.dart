@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 
-
-
 class Review {
   final String avatarUrl;
   final String content;
 
-  Review({
-    required this.avatarUrl,
-    required this.content,
-  });
+  Review({required this.avatarUrl, required this.content});
 }
 
 class DoctorReviewsScreen extends StatefulWidget {
@@ -25,17 +20,17 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
 
   List<Review> reviews = [
     Review(
-      avatarUrl: 'assets/avatar1.jpg',
+      avatarUrl: 'assets/avatar1.png',
       content:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut',
     ),
     Review(
-      avatarUrl: 'assets/avatar2.jpg',
+      avatarUrl: 'assets/avatar2.png',
       content:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut',
     ),
     Review(
-      avatarUrl: 'assets/avatar3.jpg',
+      avatarUrl: 'assets/avatar3.png',
       content:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut',
     ),
@@ -46,7 +41,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
       setState(() {
         reviews.add(
           Review(
-            avatarUrl: 'assets/avatar_me.jpg',
+            avatarUrl: 'assets/avatar_me.png',
             content: _reviewController.text,
           ),
         );
@@ -75,9 +70,10 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
         title: Text(
           'Reviews',
           style: TextStyle(
-              color: Colors.pink[300],
-              fontSize: 22,
-              fontWeight: FontWeight.bold),
+            color: Colors.pink[300],
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -97,7 +93,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
                     color: Colors.pink[100],
                     image: const DecorationImage(
                       fit: BoxFit.cover,
-                      image: AssetImage('assets/doctor.jpg'),
+                      image: AssetImage('assets/doctor.png'),
                     ),
                   ),
                 ),
@@ -105,19 +101,13 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
                 // Doctor name
                 const Text(
                   'Dr. Razan Ali',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 // Doctor title
                 Text(
                   'Senior Surgeon',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.grey[500], fontSize: 16),
                 ),
                 const SizedBox(height: 10),
                 // Rating stars
@@ -125,7 +115,10 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.pink[100],
                         borderRadius: BorderRadius.circular(20),
@@ -153,10 +146,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
               alignment: Alignment.centerLeft,
               child: Text(
                 'Some Reviews',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -178,11 +168,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(
-                  color: Colors.grey,
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                ),
+                BoxShadow(color: Colors.grey, spreadRadius: 1, blurRadius: 5),
               ],
             ),
             child: Row(
@@ -199,8 +185,10 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
                       ),
                       filled: true,
                       fillColor: const Color(0xffFFD1E2),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                 ),
@@ -232,10 +220,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
 class ReviewCard extends StatelessWidget {
   final Review review;
 
-  const ReviewCard({
-    super.key,
-    required this.review,
-  });
+  const ReviewCard({super.key, required this.review});
 
   @override
   Widget build(BuildContext context) {
@@ -260,10 +245,7 @@ class ReviewCard extends StatelessWidget {
           Expanded(
             child: Text(
               review.content,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[800],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
             ),
           ),
         ],

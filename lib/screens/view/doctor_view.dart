@@ -34,17 +34,17 @@ class DoctorView extends StatelessWidget {
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      
+
                       //back button
                       child: BackButtonn(
-                       onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => StoryView(),
-                          ),
-                        ),
-                      )
+                        onTap:
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => StoryView(),
+                              ),
+                            ),
+                      ),
                     ),
 
                     // Logo
@@ -99,7 +99,7 @@ class DoctorView extends StatelessWidget {
                           child: const CircleAvatar(
                             radius: 40,
                             backgroundImage: AssetImage(
-                              'assets/4.jpg',
+                              'assets/4.png',
                             ), // Replace with your image
                           ),
                         ),
@@ -116,7 +116,7 @@ class DoctorView extends StatelessWidget {
                           child: const CircleAvatar(
                             radius: 40,
                             backgroundImage: AssetImage(
-                              'assets/profile4.jpg',
+                              'assets/profile4.png',
                             ), // Replace with your image
                           ),
                         ),
