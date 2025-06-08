@@ -12,7 +12,7 @@ class ScannerScreen extends StatefulWidget {
 class _ScannerScreenState extends State<ScannerScreen> {
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
-
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -21,22 +21,39 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   Future<void> _initCamera() async {
-    final cameras = await availableCameras();
-    final backCamera = cameras.firstWhere( 
-      (camera) => camera.lensDirection == CameraLensDirection.back,
-    );
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) {
+        setState(() {
+          _errorMessage = 'No cameras found on device';
+        });
+        return;
+      }
 
-    _cameraController = CameraController(
-      backCamera,
-      ResolutionPreset.medium,
-      enableAudio: false,
-    );
+      final backCamera = cameras.firstWhere(
+        (camera) => camera.lensDirection == CameraLensDirection.back,
+        orElse: () => cameras.first,
+      );
 
-    await _cameraController?.initialize();
-    if (mounted) {
-      setState(() {
-        _isCameraInitialized = true;
-      });
+      _cameraController = CameraController(
+        backCamera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+
+      await _cameraController?.initialize();
+      if (mounted) {
+        setState(() {
+          _isCameraInitialized = true;
+          _errorMessage = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to initialize camera: $e';
+        });
+      }
     }
   }
 
@@ -83,7 +100,22 @@ class _ScannerScreenState extends State<ScannerScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  if (_isCameraInitialized)
+                  if (_errorMessage != null)
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            _errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    )
+                  else if (_isCameraInitialized)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: CameraPreview(_cameraController!),
@@ -92,15 +124,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     const Center(child: CircularProgressIndicator()),
 
                   // Scanner frame
-                  CustomPaint(
-                    size: const Size(250, 250),
-                    painter: ScannerFramePainter(),
-                  ),
+                  if (_isCameraInitialized)
+                    CustomPaint(
+                      size: const Size(250, 250),
+                      painter: ScannerFramePainter(),
+                    ),
                 ],
               ),
             ),
           ),
-          
 
           // Upload Button Area
           Container(
@@ -116,21 +148,29 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 ),
                 const SizedBox(height: 16),
                 CustomElevatedButton(
-                  text: 'Select File',
+                  text: 'Take Picture',
                   onTap: () async {
-  if (_cameraController != null && _cameraController!.value.isInitialized) {
-    try {
-      final XFile file = await _cameraController!.takePicture();
-      debugPrint('Picture saved to: ${file.path}');
-
-      setState(() {
-      });
-
-    } catch (e) {
-      debugPrint('Error taking picture: $e');
-    }
-  }
-}
+                    if (_cameraController != null && _cameraController!.value.isInitialized) {
+                      try {
+                        final XFile file = await _cameraController!.takePicture();
+                        debugPrint('Picture saved to: ${file.path}');
+                        // TODO: Handle the captured image
+                        // You might want to navigate to a preview screen or process the image
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error taking picture: $e')),
+                          );
+                        }
+                      }
+                    } else {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Camera not initialized')),
+                        );
+                      }
+                    }
+                  },
                 ),
               ],
             ),
@@ -140,7 +180,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
     );
   }
 }
-
 
 class ScannerFramePainter extends CustomPainter {
   @override

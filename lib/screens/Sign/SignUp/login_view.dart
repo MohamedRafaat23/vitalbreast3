@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:vitalbreast3/core/doctors/top_doctor_screen.dart';
 import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
 import 'package:vitalbreast3/widgets/default_text_form_field.dart';
-import 'package:vitalbreast3/screens/ChatBot/chat_bot_view.dart';
+import 'package:vitalbreast3/screens/view/chat_bot_view.dart';
 import 'package:vitalbreast3/widgets/back_button.dart';
 import 'package:vitalbreast3/widgets/navigateion.dart';
 import 'package:vitalbreast3/core/data/remote/dio_helper.dart';

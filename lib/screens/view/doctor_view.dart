@@ -1,5 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/screens/ChatBot/chat_bot_view.dart';
+import 'package:vitalbreast3/screens/view/chat_bot_view.dart';
 import 'package:vitalbreast3/screens/view/story_view.dart';
 import 'package:vitalbreast3/widgets/back_button.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
@@ -12,6 +14,7 @@ class DoctorView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -21,7 +24,7 @@ class DoctorView extends StatelessWidget {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(25.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -34,7 +37,7 @@ class DoctorView extends StatelessWidget {
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(20),
                       ),
-
+                      
                       //back button
                       child: BackButtonn(
                         onTap:
@@ -51,11 +54,11 @@ class DoctorView extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 50),
 
                 // Title
                 const Text(
-                  'Inspiring Stories From\nThose Who Contracted\nThe Disease And\nRecovered',
+                  'Make online and live Consultation easily with top doctors',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -63,61 +66,49 @@ class DoctorView extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 60),
 
                 // Profile images
-                const Spacer(),
-
-                // Circular profile images
-                Center(
+                SizedBox(
+                  height: 140,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Main profile image (center)
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 4),
-                        ),
-                        child: const CircleAvatar(
-                          radius: 60,
-                          backgroundImage: AssetImage(
-                            'assets/4.png',
-                          ), // Replace with your main profile image
-                        ),
-                      ),
-
-                      // Positioned profile images
+                      // Left image
                       Positioned(
-                        bottom: -10,
-                        left: 20,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
-                          ),
-                          child: const CircleAvatar(
-                            radius: 40,
-                            backgroundImage: AssetImage(
-                              'assets/4.png',
-                            ), // Replace with your image
+                        left: 40,
+                        bottom: 0,
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 42,
+                            backgroundImage: AssetImage('assets/4.png'),
                           ),
                         ),
                       ),
-
+                      // Right image
                       Positioned(
-                        bottom: -10,
-                        right: 20,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
+                        right: 40,
+                        bottom: 0,
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 42,
+                            backgroundImage: AssetImage('assets/4.png'),
                           ),
-                          child: const CircleAvatar(
-                            radius: 40,
-                            backgroundImage: AssetImage(
-                              'assets/profile4.png',
-                            ), // Replace with your image
+                        ),
+                      ),
+                      // Center image (on top)
+                      Positioned(
+                        top: 0,
+                        child: CircleAvatar(
+                          radius: 48,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 45,
+                            backgroundImage: AssetImage('assets/3.png'),
                           ),
                         ),
                       ),
@@ -125,7 +116,7 @@ class DoctorView extends StatelessWidget {
                   ),
                 ),
 
-                const Spacer(),
+               SizedBox(height: 160),
 
                 // Next button
                 CustomElevatedButton(
@@ -135,7 +126,7 @@ class DoctorView extends StatelessWidget {
                   },
                 ),
 
-                const SizedBox(height: 20),
+               
               ],
             ),
           ),

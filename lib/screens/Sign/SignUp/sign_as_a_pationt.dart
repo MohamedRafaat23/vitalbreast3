@@ -25,6 +25,7 @@ class _PationCreationState extends State<PationCreation> {
   TextEditingController mobilenumbercontroller = TextEditingController();
   TextEditingController dateofbirthcontroller = TextEditingController();
   TextEditingController citycontroller = TextEditingController();
+  TextEditingController dat = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
