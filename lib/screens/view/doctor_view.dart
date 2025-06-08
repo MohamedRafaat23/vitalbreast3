@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/screens/view/chat_bot_view.dart';

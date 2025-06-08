@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/screens/view/doctor_view.dart';
-import 'package:vitalbreast3/screens/view/welcome_view.dart';
 import 'package:vitalbreast3/widgets/back_button.dart';
+import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
+import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
 
 class StoryView extends StatefulWidget {
   const StoryView({super.key});
@@ -14,122 +15,123 @@ class _StoryViewState extends State<StoryView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.white, Color(0xFFF8BBD0)],
-            ),
+      body: Container(
+         width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.pink[50]!, Colors.pink[100]!, Colors.pink[200]!],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40), // مسافة من الأعلى
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 17),
-                child: Align(
-                  alignment: Alignment.topLeft,
-
-                  child: BackButtonn(
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WelcomeView(),
-                          ),
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 50),
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40),
-                  child: Text(
-                    'Inspiring Stories From Those Who Contracted The Disease And Recovered',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: "Inter",
-
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.center,
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Back button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Positioned(
-                      top: 40,
-                      right: 35,
-                      child: CircleAvatar(
-                        radius: 33,
-                        backgroundImage: AssetImage('assets/3.png'),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+
+                      //back button
+                      child: BackButtonn(
+                        onTap:
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => StoryView(),
+                              ),
+                            ),
                       ),
                     ),
-                    Positioned(
-                      left: 98,
-                      bottom: 50,
-                      top: 1,
-                      child: CircleAvatar(
-                        radius: 35,
-                        backgroundImage: AssetImage('assets/4.png'),
-                      ),
-                    ),
-                    Positioned(
-                      top: 40,
-                      left: 60,
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundImage: AssetImage('assets/3.png'),
-                      ),
-                    ),
+
+                    // Logo
                   ],
                 ),
-              ),
-              const SizedBox(height: 10),
 
-              Center(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  height: 55,
-                  margin: const EdgeInsets.only(bottom: 30),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DoctorView()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pinkAccent,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Next',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                const SizedBox(height: 20),
+
+                // Title
+                const Text(
+                  'Inspiring Stories From Those Who Contracted\nThe Disease And\nRecovered',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
+
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 40),
-            ],
+                const SizedBox(height: 50),
+
+                // Profile images
+                SizedBox(
+                  height: 140,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Left image
+                      Positioned(
+                        left: 40,
+                        bottom: 0,
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 42,
+                            backgroundImage: AssetImage('assets/4.png'),
+                          ),
+                        ),
+                      ),
+                      // Right image
+                      Positioned(
+                        right: 40,
+                        bottom: 0,
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 42,
+                            backgroundImage: AssetImage('assets/4.png'),
+                          ),
+                        ),
+                      ),
+                      // Center image (on top)
+                      Positioned(
+                        top: 0,
+                        child: CircleAvatar(
+                          radius: 48,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 44,
+                            backgroundImage: AssetImage('assets/3.png'),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+               SizedBox(height: 140),
+
+                // Next button
+                CustomElevatedButton(
+                  text: 'Next',
+                  onTap: () {
+                    context.push(DoctorView());
+                  },
+                ),
+
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
