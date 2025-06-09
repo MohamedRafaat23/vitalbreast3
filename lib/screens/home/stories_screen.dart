@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
@@ -42,14 +44,17 @@ class _StoriesScreenState extends State<StoriesScreen> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Handle successful response
-        print('Data received: ${response.data}');
+        log('Data received: ${response.data}');
+
         // You can parse the response data here
       }
     } on DioException catch (e) {
-      String errorMessage = 'An error occurred while fetching data';
-      if (e.response?.data is Map && e.response?.data['message'] != null) {
-        errorMessage = e.response?.data['message'];
-      }
+      String errorMessage = 'An error occurred while fetching data $e';
+      log(errorMessage);
+      // You can handle the error message here (e.g., show an error message to the user
+      // if (e.response?.data is Map && e.response?.data['message'] != null) {
+      //   errorMessage = e.response?.data['message'];
+      // }
       if (mounted) {
         ScaffoldMessenger.of(
           context,
