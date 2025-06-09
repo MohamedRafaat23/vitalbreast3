@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
 import 'package:vitalbreast3/core/models/user.dart';
-import 'package:vitalbreast3/screens/Sign/SignUp/complete_signing.dart';
+import 'package:vitalbreast3/screens/Sign/SignUp/sign_up_succ.dart';
 import 'package:vitalbreast3/screens/Sign/SignUp/sign_up_view.dart';
 import 'package:vitalbreast3/widgets/back_button.dart';
 import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
@@ -23,7 +23,9 @@ class _DoctorCreationState extends State<DoctorCreation> {
   final TextEditingController namecontroller = TextEditingController();
   final TextEditingController passwordcontroller = TextEditingController();
   final TextEditingController mobilenumbercontroller = TextEditingController();
+  final TextEditingController citycontroller = TextEditingController();
   final TextEditingController dateofbirthcontroller = TextEditingController();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
@@ -38,13 +40,15 @@ class _DoctorCreationState extends State<DoctorCreation> {
 
     try {
       final form = FormData.fromMap({
-        'name': namecontroller.text.trim(),
-        'email': emailcontroller.text.trim(),
-        'password': passwordcontroller.text.trim(),
-        'phone': mobilenumbercontroller.text.trim(),
-        'city': dateofbirthcontroller.text.trim(),
-        'role': 'doctor',
-      });
+  'name': namecontroller.text.trim(),
+  'email': emailcontroller.text.trim(),
+  'password': passwordcontroller.text.trim(),
+  'phone': mobilenumbercontroller.text.trim(),
+  'city': citycontroller.text.trim(),
+  'date': dateofbirthcontroller.text.trim(),
+  'role': 'doctor',
+});
+
 
       final response = await DioHelper.dio.post(ApiConstant.signup, data: form);
 
@@ -54,7 +58,7 @@ class _DoctorCreationState extends State<DoctorCreation> {
         if (mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const DoctorInformation()),
+            MaterialPageRoute(builder: (context) => const SignUPSuccess()),
           );
         }
       }
@@ -148,11 +152,17 @@ class _DoctorCreationState extends State<DoctorCreation> {
                           const SizedBox(height: 20),
                           DefaultTextFormField(
                             controller: dateofbirthcontroller,
-                            hintText: 'City',
+                            hintText: 'Date of Birth',
                           ),
                           const SizedBox(height: 20),
+                          DefaultTextFormField(
+                            controller: citycontroller,
+                            hintText: 'city',
+                          ),
+                           const SizedBox(height: 20),
+                          
                           CustomElevatedButton(
-                            text: _isLoading ? "Signing up..." : "Next",
+                            text: _isLoading ? "Signing up..." : "signing up",
                             onTap: _isLoading ? null : signUp,
                           ),
                           const SizedBox(height: 50),

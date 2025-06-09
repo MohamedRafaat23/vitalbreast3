@@ -202,74 +202,74 @@ class _ProfileScreenState extends State<MyProfileScreen> {
 
                             const SizedBox(height: 4),
 
-                            // Certificate upload
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Certificate',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 20,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: lighterPink,
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.cloud_download_outlined,
-                                        size: 40,
-                                        color: Colors.black54,
-                                      ),
-                                      const SizedBox(height: 12),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          // File picker logic would go here
-                                          setState(() {
-                                            _selectedFilePath =
-                                                'selected_certificate.pdf';
-                                          });
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(
-                                            0xffFA7CA5,
-                                          ),
-                                          foregroundColor: Colors.white,
-                                          minimumSize: const Size(1200, 35),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              18,
-                                            ),
-                                          ),
-                                        ),
-                                        child: const Text('Select file'),
-                                      ),
-                                      if (_selectedFilePath != null)
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 8.0,
-                                          ),
-                                          child: Text(
-                                            'File: $_selectedFilePath',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                            // // Certificate upload
+                            // Column(
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   children: [
+                            //     const Text(
+                            //       'Certificate',
+                            //       style: TextStyle(
+                            //         fontSize: 16,
+                            //         fontWeight: FontWeight.w500,
+                            //       ),
+                            //     ),
+                            //     const SizedBox(height: 8),
+                            //     Container(
+                            //       padding: const EdgeInsets.symmetric(
+                            //         vertical: 20,
+                            //       ),
+                            //       decoration: BoxDecoration(
+                            //         color: lighterPink,
+                            //         borderRadius: BorderRadius.circular(25),
+                            //       ),
+                            //       child: Column(
+                            //         mainAxisAlignment: MainAxisAlignment.center,
+                            //         children: [
+                            //           const Icon(
+                            //             Icons.cloud_download_outlined,
+                            //             size: 40,
+                            //             color: Colors.black54,
+                            //           ),
+                            //           const SizedBox(height: 12),
+                            //           ElevatedButton(
+                            //             onPressed: () {
+                            //               // File picker logic would go here
+                            //               setState(() {
+                            //                 _selectedFilePath =
+                            //                     'selected_certificate.pdf';
+                            //               });
+                            //             },
+                            //             style: ElevatedButton.styleFrom(
+                            //               backgroundColor: const Color(
+                            //                 0xffFA7CA5,
+                            //               ),
+                            //               foregroundColor: Colors.white,
+                            //               minimumSize: const Size(1200, 35),
+                            //               shape: RoundedRectangleBorder(
+                            //                 borderRadius: BorderRadius.circular(
+                            //                   18,
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //             child: const Text('Select file'),
+                            //           ),
+                            //           if (_selectedFilePath != null)
+                            //             Padding(
+                            //               padding: const EdgeInsets.only(
+                            //                 top: 8.0,
+                            //               ),
+                            //               child: Text(
+                            //                 'File: $_selectedFilePath',
+                            //                 style: const TextStyle(
+                            //                   fontSize: 12,
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //         ],
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
 
                             const SizedBox(height: 32),
 

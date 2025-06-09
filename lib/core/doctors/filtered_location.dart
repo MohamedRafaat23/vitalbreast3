@@ -62,7 +62,7 @@ class DoctorListingScreen extends StatelessWidget {
                   ),
                   SizedBox(width: 8),
                   Icon(
-                    Icons.home_filled,
+                    Icons.location_on,
                     color: Color(0xffFA7CA5),
                     size: 20,
                   ),
