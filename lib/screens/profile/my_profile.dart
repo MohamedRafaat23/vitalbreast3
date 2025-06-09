@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/data/local/cashe_helper.dart';
 import '../../../core/data/remote/dio_helper.dart';
@@ -16,17 +20,16 @@ class MyProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<MyProfileScreen> {
   bool _isLoading = false;
   User? _user;
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+  String? _uploadedImageUrl;
 
-  // Initial values
   final Map<String, String> _profileData = {
     'Full Name': '',
     'Phone Number': '',
     'Email': '',
-    'Date Of Birth': '',
     'City': '',
   };
-
-  String? _selectedFilePath;
 
   @override
   void initState() {
@@ -35,10 +38,7 @@ class _ProfileScreenState extends State<MyProfileScreen> {
   }
 
   Future<void> _fetchProfileData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
+    setState(() => _isLoading = true);
     try {
       final response = await DioHelper.dio.get(
         '${ApiConstant.baseUrl}/accounts/auth/users/me/',
@@ -50,42 +50,113 @@ class _ProfileScreenState extends State<MyProfileScreen> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          _user = User.fromJson(response.data);
-          _profileData['Full Name'] = _user?.name ?? '';
-          _profileData['Phone Number'] = _user?.phone ?? '';
-          _profileData['Email'] = _user?.email ?? '';
-          _profileData['City'] = _user?.city ?? '';
-        });
+        _user = User.fromJson(response.data);
+        _profileData['Full Name'] = _user?.name ?? '';
+        _profileData['Phone Number'] = _user?.phone ?? '';
+        _profileData['Email'] = _user?.email ?? '';
+        _profileData['City'] = _user?.city ?? '';
+        _uploadedImageUrl = _user?.profileImage;
       }
-    } on DioException catch (e) {
-      String errorMessage = 'An error occurred while fetching profile data';
-      if (e.response?.data != null && e.response?.data['message'] != null) {
-        errorMessage = e.response?.data['message'];
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(errorMessage)));
-      }
-    } catch (e) {
-      if (mounted) {
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('⚠️ Failed to fetch profile')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() => _selectedImage = File(picked.path));
+      await _uploadToImgbb(_selectedImage!);
+    }
+  }
+
+  Future<void> _uploadToImgbb(File image) async {
+    const imgbbApiKey = 'b8a6a51b1cd9b97c86af8a695ecdd13a';
+    final url = 'https://api.imgbb.com/1/upload?key=$imgbbApiKey';
+
+    try {
+      final base64Image = base64Encode(await image.readAsBytes());
+      final formData = FormData.fromMap({'image': base64Image});
+
+      final response = await Dio().post(url, data: formData);
+
+      if (response.statusCode == 200) {
+        final imageUrl = response.data['data']['url'];
+        setState(() => _uploadedImageUrl = imageUrl);
+        print('👁 Uploaded Image URL: $imageUrl');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('An unexpected error occurred')),
+          const SnackBar(content: Text('✅ Image uploaded to ImgBB')),
+        );
+      } else {
+        throw Exception('Upload failed');
+      }
+    } catch (_) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('❌ ImgBB upload failed')));
+    }
+  }
+
+  Future<void> _updateProfile() async {
+    setState(() => _isLoading = true);
+
+    try {
+      print('👁 Uploaded Image URL: $_uploadedImageUrl');
+
+      final response = await DioHelper.dio.patch(
+        '${ApiConstant.baseUrl}/accounts/auth/users/me/',
+        data: {
+          'name': _profileData['Full Name'],
+          'phone': _profileData['Phone Number'],
+          'email': _profileData['Email'],
+          'city': _profileData['City'],
+          if (_uploadedImageUrl != null) 'profile_img': _uploadedImageUrl,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        _user = User.fromJson(response.data);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Profile updated successfully')),
         );
       }
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('❌ Failed to update profile')),
+      );
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const lighterPink = Color(0xFFFFD6E5);
+    final imageWidget =
+        _selectedImage != null
+            ? Image.file(
+              _selectedImage!,
+              width: 110,
+              height: 110,
+              fit: BoxFit.cover,
+            )
+            : (_uploadedImageUrl != null
+                ? Image.network(
+                  _uploadedImageUrl!,
+                  width: 110,
+                  height: 110,
+                  fit: BoxFit.cover,
+                )
+                : const Icon(Icons.person, size: 60, color: Colors.white));
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -97,7 +168,6 @@ class _ProfileScreenState extends State<MyProfileScreen> {
                 )
                 : CustomScrollView(
                   slivers: [
-                    // App Bar
                     SliverAppBar(
                       pinned: true,
                       floating: true,
@@ -120,17 +190,12 @@ class _ProfileScreenState extends State<MyProfileScreen> {
                       ),
                       centerTitle: true,
                     ),
-
-                    // Content
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24.0),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const SizedBox(height: 20),
-
-                            // Profile picture
                             Center(
                               child: Stack(
                                 children: [
@@ -141,222 +206,50 @@ class _ProfileScreenState extends State<MyProfileScreen> {
                                       color: Color(0xffFA7CA5),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: Center(
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(55),
-                                        child: Image.network(
-                                          'https://via.placeholder.com/110',
-                                          width: 110,
-                                          height: 110,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (
-                                            context,
-                                            error,
-                                            stackTrace,
-                                          ) {
-                                            return const Icon(
-                                              Icons.person,
-                                              size: 60,
-                                              color: Colors.white,
-                                            );
-                                          },
-                                        ),
-                                      ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(60),
+                                      child: imageWidget,
                                     ),
                                   ),
                                   Positioned(
                                     bottom: 0,
                                     right: 0,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xffFFD1E2),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.edit,
-                                        color: Color(0xffFA7CA5),
-                                        size: 18,
+                                    child: GestureDetector(
+                                      onTap: _pickImage,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xffFFD1E2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.edit,
+                                          color: Color(0xffFA7CA5),
+                                          size: 18,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-
                             const SizedBox(height: 32),
-
-                            // Form fields
-                            ..._profileData.entries.map(
-                              (entry) => _buildFormField(
-                                label: entry.key,
-                                initialValue: entry.value,
+                            ...[
+                              'Full Name',
+                              'Phone Number',
+                              'Email',
+                              'City',
+                            ].map(
+                              (key) => _buildFormField(
+                                label: key,
+                                initialValue: _profileData[key] ?? '',
                                 backgroundColor: const Color(0xffFFD1E2),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _profileData[entry.key] = value;
-                                  });
-                                },
+                                onChanged: (val) => _profileData[key] = val,
                               ),
                             ),
-
-                            const SizedBox(height: 4),
-
-                            // // Certificate upload
-                            // Column(
-                            //   crossAxisAlignment: CrossAxisAlignment.start,
-                            //   children: [
-                            //     const Text(
-                            //       'Certificate',
-                            //       style: TextStyle(
-                            //         fontSize: 16,
-                            //         fontWeight: FontWeight.w500,
-                            //       ),
-                            //     ),
-                            //     const SizedBox(height: 8),
-                            //     Container(
-                            //       padding: const EdgeInsets.symmetric(
-                            //         vertical: 20,
-                            //       ),
-                            //       decoration: BoxDecoration(
-                            //         color: lighterPink,
-                            //         borderRadius: BorderRadius.circular(25),
-                            //       ),
-                            //       child: Column(
-                            //         mainAxisAlignment: MainAxisAlignment.center,
-                            //         children: [
-                            //           const Icon(
-                            //             Icons.cloud_download_outlined,
-                            //             size: 40,
-                            //             color: Colors.black54,
-                            //           ),
-                            //           const SizedBox(height: 12),
-                            //           ElevatedButton(
-                            //             onPressed: () {
-                            //               // File picker logic would go here
-                            //               setState(() {
-                            //                 _selectedFilePath =
-                            //                     'selected_certificate.pdf';
-                            //               });
-                            //             },
-                            //             style: ElevatedButton.styleFrom(
-                            //               backgroundColor: const Color(
-                            //                 0xffFA7CA5,
-                            //               ),
-                            //               foregroundColor: Colors.white,
-                            //               minimumSize: const Size(1200, 35),
-                            //               shape: RoundedRectangleBorder(
-                            //                 borderRadius: BorderRadius.circular(
-                            //                   18,
-                            //                 ),
-                            //               ),
-                            //             ),
-                            //             child: const Text('Select file'),
-                            //           ),
-                            //           if (_selectedFilePath != null)
-                            //             Padding(
-                            //               padding: const EdgeInsets.only(
-                            //                 top: 8.0,
-                            //               ),
-                            //               child: Text(
-                            //                 'File: $_selectedFilePath',
-                            //                 style: const TextStyle(
-                            //                   fontSize: 12,
-                            //                 ),
-                            //               ),
-                            //             ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-
                             const SizedBox(height: 32),
-
-                            // Update button
                             ElevatedButton(
-                              onPressed:
-                                  _isLoading
-                                      ? null
-                                      : () async {
-                                        setState(() {
-                                          _isLoading = true;
-                                        });
-
-                                        try {
-                                          final response = await DioHelper.dio.put(
-                                            '${ApiConstant.baseUrl}/accounts/auth/users/me/',
-                                            data: {
-                                              'name': _profileData['Full Name'],
-                                              'phone':
-                                                  _profileData['Phone Number'],
-                                              'email': _profileData['Email'],
-                                              'city': _profileData['City'],
-                                            },
-                                            options: Options(
-                                              headers: {
-                                                'Authorization':
-                                                    'Token ${CasheHelper.getData(key: 'token')}',
-                                              },
-                                            ),
-                                          );
-
-                                          if (response.statusCode == 200) {
-                                            setState(() {
-                                              _user = User.fromJson(
-                                                response.data,
-                                              );
-                                            });
-                                            if (mounted) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Profile updated successfully',
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        } on DioException catch (e) {
-                                          String errorMessage =
-                                              'An error occurred while updating profile';
-                                          if (e.response?.data != null &&
-                                              e.response?.data['message'] !=
-                                                  null) {
-                                            errorMessage =
-                                                e.response?.data['message'];
-                                          }
-                                          if (mounted) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(errorMessage),
-                                              ),
-                                            );
-                                          }
-                                        } catch (e) {
-                                          if (mounted) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  'An unexpected error occurred',
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        } finally {
-                                          if (mounted) {
-                                            setState(() {
-                                              _isLoading = false;
-                                            });
-                                          }
-                                        }
-                                      },
+                              onPressed: _isLoading ? null : _updateProfile,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xffFA7CA5),
                                 foregroundColor: Colors.white,
@@ -373,7 +266,6 @@ class _ProfileScreenState extends State<MyProfileScreen> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 32),
                           ],
                         ),
@@ -412,14 +304,6 @@ class _ProfileScreenState extends State<MyProfileScreen> {
                 vertical: 15,
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(25),
                 borderSide: BorderSide.none,
               ),

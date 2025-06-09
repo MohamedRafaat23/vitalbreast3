@@ -6,6 +6,7 @@ class User {
   String? city;
   String? role;
   String? token;
+  String? profileImage;
 
   User({
     this.id,
@@ -15,6 +16,7 @@ class User {
     this.city,
     this.role,
     this.token,
+    this.profileImage,
   });
 
   User.fromJson(Map<String, dynamic> json) {
@@ -25,5 +27,6 @@ class User {
     city = json['city'];
     token = json['auth_token'];
     role = json['role'];
+    profileImage = json['profile_img'];
   }
 }

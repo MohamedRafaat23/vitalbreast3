@@ -47,7 +47,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
       }
     } on DioException catch (e) {
       String errorMessage = 'An error occurred while fetching data';
-      if (e.response?.data != null && e.response?.data['message'] != null) {
+      if (e.response?.data is Map && e.response?.data['message'] != null) {
         errorMessage = e.response?.data['message'];
       }
       if (mounted) {

@@ -1,12 +1,13 @@
-
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 import 'package:vitalbreast3/screens/profile/all_appointments.dart';
-import 'dart:ui';
-
 import 'package:vitalbreast3/screens/profile/my_profile.dart';
-
-
+import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
+import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
+import 'package:vitalbreast3/core/network/api_constant.dart';
+import 'package:vitalbreast3/core/models/user.dart';
+import 'dart:ui';
+import 'package:dio/dio.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,238 +20,293 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _showLogoutDialog = false;
   final ScrollController _scrollController = ScrollController();
 
+  User? _user;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileData();
+  }
+
+  Future<void> _fetchProfileData() async {
+    try {
+      final response = await DioHelper.dio.get(
+        '${ApiConstant.baseUrl}/accounts/auth/users/me/',
+        options: Options(
+          headers: {
+            'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _user = User.fromJson(response.data);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('⚠️ Failed to load profile'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _logout() async {
+    await CasheHelper.removeData(key: 'token');
+    if (!mounted) return;
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
+  Widget buildProfileImage(User? user) {
+    final hasImage =
+        user?.profileImage != null && user!.profileImage!.isNotEmpty;
+
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xffFA7CA5),
+        image:
+            hasImage
+                ? DecorationImage(
+                  image: NetworkImage(user!.profileImage!),
+                  fit: BoxFit.cover,
+                )
+                : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child:
+          !hasImage
+              ? Center(
+                child: Text(
+                  user?.name?.substring(0, 1).toUpperCase() ?? '',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+              : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Main content with scrolling
-          ListView(
-            controller: _scrollController,
-            padding: EdgeInsets.zero,
-            children: [
-              SafeArea(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    // Profile title
-                    const Text(
-                      'Profile',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xffFA7CA5),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Profile picture
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xffFA7CA5),
-                        image: const DecorationImage(
-                          image:
-                              NetworkImage('https://i.pravatar.cc/300?img=5'),
-                          fit: BoxFit.cover,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black,
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Username
-                    const Text(
-                      'Sarah Ali',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-
-                    // Menu options
-                    _buildMenuItem(
-                      icon: Icons.person_outline,
-                      title: 'My Profile',
-                      onTap: () {
-                        context.push(const MyProfileScreen());
-                      },
-                    ),
-
-                    _buildMenuItem(
-                      icon: Icons.watch_later,
-                      title: 'Appointment management',
-                      onTap: () {
-                        context.push(const AllAppointmentsScreen());
-                      },
-                    ),
-                    
-                    _buildMenuItem(
-                      icon: Icons.lock_outline,
-                      title: 'Password Manager',
-                      onTap: () {},
-                    ),
-                    
-
-                    // Logout button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 20),
-                      child: ElevatedButton(
-                        onPressed: () =>
-                            setState(() => _showLogoutDialog = true),
-                        style: ElevatedButton.styleFrom(
-                          shadowColor: Colors.black,
-                          elevation: 5,
-                          backgroundColor: const Color(0xffFA7CA5),
-                          foregroundColor: Colors.white,
-                          side: const BorderSide(color: Colors.white, width: 1),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text(
-                          'Log Out',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Bottom space for better scrolling experience
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          // Blur overlay when dialog is shown
-          if (_showLogoutDialog)
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Container(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-
-          // Logout confirmation dialog
-          if (_showLogoutDialog)
-            Center(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 30),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Log Out',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xffFA7CA5),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Are you sure you want to log out?',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // No button
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () =>
-                                setState(() => _showLogoutDialog = false),
-                            style: ElevatedButton.styleFrom(
-                              shadowColor: Colors.black,
-                              elevation: 5,
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.black,
-                              
-                              side: const BorderSide(
-                                  color: Colors.black, width: 1),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+      body:
+          _isLoading
+              ? const Center(
+                child: CircularProgressIndicator(color: Color(0xffFA7CA5)),
+              )
+              : Stack(
+                children: [
+                  ListView(
+                    controller: _scrollController,
+                    padding: EdgeInsets.zero,
+                    children: [
+                      SafeArea(
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Profile',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xffFA7CA5),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
-                            child: const Text('No'),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Yes, Log Out button
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Handle logout logic
-                              setState(() => _showLogoutDialog = false);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              shadowColor: Colors.black,
-                              elevation: 5,
-                              backgroundColor: const Color(0xffFA7CA5),
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(
-                                  color: Colors.white, width: 1),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                            const SizedBox(height: 24),
+
+                            // Profile Picture
+                            buildProfileImage(_user),
+
+                            const SizedBox(height: 16),
+
+                            // Username
+                            Text(
+                              _user?.name ?? 'Guest',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
-                            child: const Text('Yes, Log Out'),
-                          ),
+                            const SizedBox(height: 30),
+
+                            _buildMenuItem(
+                              icon: Icons.person_outline,
+                              title: 'My Profile',
+                              onTap: () {
+                                context.push(const MyProfileScreen());
+                              },
+                            ),
+                            _buildMenuItem(
+                              icon: Icons.watch_later,
+                              title: 'Appointment management',
+                              onTap: () {
+                                context.push(const AllAppointmentsScreen());
+                              },
+                            ),
+                            _buildMenuItem(
+                              icon: Icons.lock_outline,
+                              title: 'Password Manager',
+                              onTap: () {},
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 20,
+                              ),
+                              child: ElevatedButton(
+                                onPressed:
+                                    () => setState(
+                                      () => _showLogoutDialog = true,
+                                    ),
+                                style: ElevatedButton.styleFrom(
+                                  shadowColor: Colors.black,
+                                  elevation: 5,
+                                  backgroundColor: const Color(0xffFA7CA5),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  minimumSize: const Size(double.infinity, 50),
+                                ),
+                                child: const Text(
+                                  'Log Out',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 40),
+                          ],
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+
+                  // Logout Dialog Overlay
+                  if (_showLogoutDialog)
+                    Positioned.fill(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                        child: Container(color: Colors.black.withOpacity(0.5)),
+                      ),
                     ),
-                  ],
-                ),
+
+                  // Logout Dialog
+                  if (_showLogoutDialog)
+                    Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 30),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black,
+                              blurRadius: 10,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Log Out',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xffFA7CA5),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Are you sure you want to log out?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed:
+                                        () => setState(
+                                          () => _showLogoutDialog = false,
+                                        ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      side: const BorderSide(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    child: const Text('No'),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: _logout,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xffFA7CA5),
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: const Text('Yes, Log Out'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ),
-        ],
-      ),
     );
   }
 
@@ -278,11 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   shape: BoxShape.circle,
                   color: Color(0xffFA7CA5),
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                child: Icon(icon, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 16),
               Text(
