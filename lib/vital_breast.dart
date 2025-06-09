@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/core/doctors/top_doctor_screen.dart';
+import 'package:vitalbreast3/navbar/top_doctor_screen.dart';
 
 import 'package:vitalbreast3/screens/view/welcome_view.dart';
 

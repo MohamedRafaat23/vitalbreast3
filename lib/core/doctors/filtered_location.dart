@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:vitalbreast3/core/doctors/doctor_details.dart';
+import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 
 
 
@@ -195,7 +197,7 @@ class DoctorCard extends StatelessWidget {
                     children: [
                       const Icon(
                         Icons.access_time,
-                        size: 14,
+                        size: 15,
                         color: Color(0xffFA7CA5),
                       ),
                       const SizedBox(width: 4),
@@ -286,13 +288,16 @@ class DoctorCard extends StatelessWidget {
                     color: const Color(0xffFA7CA5),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.add,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child:InkWell(
+              onTap: () {
+                context.push(DoctorDetailScreen());
+              },
+              child: const Icon(
+                Icons.arrow_forward_sharp,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
                 ),
               ],
             ),

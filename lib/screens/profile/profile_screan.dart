@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 import 'package:vitalbreast3/screens/profile/all_appointments.dart';
 import 'dart:ui';
 
 import 'package:vitalbreast3/screens/profile/my_profile.dart';
+import 'package:vitalbreast3/screens/Sign/SignUp/authentification.dart';
 
 
 
@@ -227,6 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onPressed: () {
                               // Handle logout logic
                               setState(() => _showLogoutDialog = false);
+                              context.pushReplacement(const Authentification());
                             },
                             style: ElevatedButton.styleFrom(
                               shadowColor: Colors.black,

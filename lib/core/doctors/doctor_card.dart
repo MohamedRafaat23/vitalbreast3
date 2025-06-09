@@ -115,12 +115,13 @@ class DoctorCard extends StatelessWidget {
               color: Color(0xffFA7CA5),
               borderRadius: BorderRadius.circular(8),
             ),
+                                                   //Button 
             child: InkWell(
               onTap: () {
                 context.push(DoctorListingScreen());
               },
               child: const Icon(
-                Icons.add,
+                Icons.arrow_forward_sharp,
                 color: Colors.white,
                 size: 20,
               ),

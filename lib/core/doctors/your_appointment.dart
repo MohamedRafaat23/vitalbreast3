@@ -71,7 +71,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(13),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -93,7 +93,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
                           color: Colors.yellow,
                           size: 20,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 6),
                         Text(
                           '4.9 (46 reviews)',
                           style: TextStyle(
@@ -145,11 +145,12 @@ class AppointmentDetailsScreen extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
+                          fontSize: 10
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 2),
                       Container(
-                        width: 1,
+                        width: 2,
                         height: 16,
                         color: Colors.white,
                       ),
@@ -158,6 +159,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
                         'WED, 11:00 AM',
                         style: TextStyle(
                           color: Colors.white,
+                          fontSize: 10,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -171,8 +173,8 @@ class AppointmentDetailsScreen extends StatelessWidget {
                   context.push(const CancelAppointmentScreen());
                 },
                 child: Container(
-                  width: 45,
-                  height: 45,
+                  width: 40,
+                  height: 40,
                   decoration: const BoxDecoration(
                     color: Color(0xffFA7CA5),
                     shape: BoxShape.circle,
@@ -180,7 +182,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
                   child: const Icon(
                     Icons.close,
                     color: Colors.white,
-                    size: 18,
+                    size: 17,
                   ),
                 ),
               ),

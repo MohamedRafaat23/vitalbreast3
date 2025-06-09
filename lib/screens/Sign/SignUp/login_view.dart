@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:vitalbreast3/core/doctors/top_doctor_screen.dart';
+import 'package:vitalbreast3/navbar/top_doctor_screen.dart';
 import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
 import 'package:vitalbreast3/widgets/default_text_form_field.dart';
 import 'package:vitalbreast3/screens/view/chat_bot_view.dart';
