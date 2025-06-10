@@ -2,14 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/doctors/appointment.dart';
 import 'package:vitalbreast3/core/doctors/reviews.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
-
-
+import 'package:vitalbreast3/core/models/all.dart'; // Import shared models
 
 class DoctorDetailScreen extends StatelessWidget {
-  const DoctorDetailScreen({super.key});
+  final Doctor doctor;
+
+  const DoctorDetailScreen({super.key, required this.doctor});
 
   @override
   Widget build(BuildContext context) {
+    // Infer gender for image placeholder (simplified)
+    bool isFemale = doctor.name.contains('Hannah') || doctor.name.contains('Brandy');
+    // Format stats
+    String patientCount = doctor.patientCount == '0' ? '100+' : '${doctor.patientCount}+';
+    String experienceYears = '${doctor.experienceYears}+';
+    String reviewsCount = doctor.reviewsCount == '0' ? '50+' : '${doctor.reviewsCount}+';
+    String rating = doctor.rating;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -41,75 +50,67 @@ class DoctorDetailScreen extends StatelessWidget {
                   height: 250,
                   color: Theme.of(context).primaryColor,
                   child: Image.network(
-                    'https://i.pravatar.cc/300?img=5',
+                    'https://i.pravatar.cc/300?img=${doctor.id.hashCode % 10 + 1}',
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
-
               // Doctor Info
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Dr. Razan Ali',
-                    style: TextStyle(
+                    doctor.name,
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Row(
                     children: [
-                      Icon(Icons.star, color: Colors.amber, size: 18),
-                      SizedBox(width: 4),
+                      const Icon(Icons.star, color: Colors.amber, size: 18),
+                      const SizedBox(width: 4),
                       Text(
-                        '4.9',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                        rating,
+                        style: const TextStyle(
                           fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
-                        '(48 reviews)',
-                        style: TextStyle(
+                        '($reviewsCount reviews)',
+                        style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.black54,
+                          color: Colors.grey,
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-
-              const SizedBox(height: 4),
-
+              const SizedBox(height: 8),
               const Text(
-                'Cardiologist and Surgeon',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
+                'Specialist Doctor', // Placeholder for specialty
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
-
               const SizedBox(height: 24),
-
               // Stats Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildStatColumn(Icons.person_outline, const Color(0xffFA7CA5),
-                      '116+', 'Patients'),
+                      patientCount, 'Patients'),
                   _buildStatColumn(Icons.calendar_today_outlined,
-                      const Color(0xffFA7CA5), '3+', 'Years'),
+                      const Color(0xffFA7CA5), experienceYears, 'Years'),
                   _buildStatColumn(Icons.star_outline, const Color(0xffFA7CA5),
-                      '4.9', 'Rating'),
+                      rating, 'Rating'),
                   _buildStatColumn(Icons.chat_bubble_outline,
-                      const Color(0xffFA7CA5), '90+', 'Reviews'),
+                      const Color(0xffFA7CA5), reviewsCount, 'Reviews'),
                 ],
               ),
-
               const SizedBox(height: 24),
-
               // About Doctor Section
               const Text(
                 'About Doctor',
@@ -118,24 +119,20 @@ class DoctorDetailScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 12),
-
-              const Text(
-                'Dr. Razan Ali is the top mass cardiologist specialist in Lipton Hospital in London, UK. She achieved several awards in her medical career. She has over 3 years of experience and a high rating from her patients.',
-                style: TextStyle(
+              Text(
+                '${doctor.name} is a highly experienced specialist with over $experienceYears of experience. They have served $patientCount patients with a rating of from $reviewsCount reviews.',
+                style: const TextStyle(
                   fontSize: 14,
-                  color: Colors.black54,
+                  color: Colors.grey,
                   height: 1.5,
                 ),
               ),
-
               const SizedBox(height: 24),
-
               // Buttons
               ElevatedButton(
                 onPressed: () {
-                  context.push(const AppointmentScreen());
+                 // context.push(AppointmentScreen(doctor: doctor)); // Pass doctor
                 },
                 style: ElevatedButton.styleFrom(
                   side: const BorderSide(color: Colors.white),
@@ -154,12 +151,10 @@ class DoctorDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 12),
-
               OutlinedButton(
                 onPressed: () {
-                  context.push(const DoctorReviewsScreen());
+                 // context.push(DoctorReviewsScreen(doctor: doctor)); // Pass doctor
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white),
@@ -170,7 +165,7 @@ class DoctorDetailScreen extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'See reviews',
+                  'See Reviews',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

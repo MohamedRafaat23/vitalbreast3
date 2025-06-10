@@ -118,7 +118,7 @@ class DoctorCard extends StatelessWidget {
                                                    //Button 
             child: InkWell(
               onTap: () {
-                context.push(DoctorDetailScreen());
+               // context.push(DoctorDetailScreen(doctor: Doctor));
               },
               child: const Icon(
                 Icons.arrow_forward_sharp,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/doctors/body_doctor_screen.dart';
-import 'package:vitalbreast3/core/doctors/filtered_location.dart';
+import 'package:vitalbreast3/core/doctors/doctors.dart';
 import 'package:vitalbreast3/screens/ChatBot/chat_bot.dart';
 import 'package:vitalbreast3/screens/home/stories_screen.dart';
 import 'package:vitalbreast3/screens/profile/profile_screan.dart';
@@ -108,7 +108,7 @@ class _LayoutMainScreenState extends State<LayoutMainScreen> {
           IconButton(
             icon: const Icon(Icons.location_on, color: Colors.grey),
             onPressed: () {
-              context.push(const DoctorListingScreen());
+              context.push( DoctorListingScreen());
             },
           ),
         ],
@@ -151,8 +151,8 @@ class _LayoutMainScreenState extends State<LayoutMainScreen> {
   }
 
   List screenList = [
-    const StoriesScreen(),
-    const BodyDoctorScreen(),
+    const TweetsScreen(),
+     DoctorListingScreen(),
     const ScannerScreen(),
     const ChatScreen(),
     const ProfileScreen(),

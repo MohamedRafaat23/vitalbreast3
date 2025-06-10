@@ -1,11 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:vitalbreast3/core/doctors/doctor_details.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
-
-
+import 'package:intl/intl.dart';
+import 'package:vitalbreast3/core/models/all.dart'; // Updated import to all.dart
 
 class DoctorListingScreen extends StatelessWidget {
   const DoctorListingScreen({super.key});
+
+  // Fetch doctors using Dio
+  Future<List<Doctor>> fetchDoctors() async {
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        'https://engmohamedshr18.pythonanywhere.com/clinic/doctors/',
+      );
+      if (response.statusCode == 200) {
+        List jsonResponse = response.data;
+        return jsonResponse.map((doctor) => Doctor.fromJson(doctor)).toList();
+      } else {
+        throw Exception('Failed to load doctors: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching doctors: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,103 +38,62 @@ class DoctorListingScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 16),
               // Header
-              Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 18,
-                    backgroundImage:
-                        NetworkImage('https://i.pravatar.cc/150?img=5'),
-                  ),
-                  const SizedBox(width: 8),
-                  RichText(
-                    text: const TextSpan(
-                      text: 'Hello ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Sarah!',
-                          style: TextStyle(
-                            color: Color(0xffFA7CA5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
 
-              const SizedBox(height: 24),
-
-              // Filter Text
-              const Row(
-                children: [
-                  Text(
-                    'Filtered by location',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Icon(
-                    Icons.location_on,
-                    color: Color(0xffFA7CA5),
-                    size: 20,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
 
               // Doctor List
               Expanded(
-                child: ListView(
-                  children: const [
-                    DoctorCard(
-                      name: 'Dr. Ahmed Hesham',
-                      time: '10:30 AM-5:30 PM',
-                      location: 'Sheraton, Cairo',
-                      rating: 4.7,
-                      salary: 350,
-                      imgUrl: 'https://i.pravatar.cc/150?img=11',
-                      isFemale: false,
-                    ),
-                    SizedBox(height: 12),
-                    DoctorCard(
-                      name: 'Dr. Hala Ahmed',
-                      time: '10:30 AM-3:30 PM',
-                      location: 'Nasr City',
-                      rating: 5.0,
-                      salary: 300,
-                      imgUrl: 'https://i.pravatar.cc/150?img=1',
-                      isFemale: true,
-                    ),
-                    SizedBox(height: 12),
-                    DoctorCard(
-                      name: 'Dr. Youssef Hesham',
-                      time: '11:00 AM-4:00 PM',
-                      location: 'Maadi',
-                      rating: 4.8,
-                      salary: 320,
-                      imgUrl: 'https://i.pravatar.cc/150?img=12',
-                      isFemale: false,
-                    ),
-                    SizedBox(height: 12),
-                    DoctorCard(
-                      name: 'Dr. Mariam Mostafa',
-                      time: '10:00 AM-2:30 PM',
-                      location: 'Dokki',
-                      rating: 4.5,
-                      salary: 280,
-                      imgUrl: 'https://i.pravatar.cc/150?img=3',
-                      isFemale: true,
-                    ),
-                    SizedBox(height: 12),
-                  ],
+                child: FutureBuilder<List<Doctor>>(
+                  future: fetchDoctors(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No doctors found'));
+                    }
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final doctor = snapshot.data![index];
+                        // Infer gender based on name (simplified)
+                        bool isFemale = doctor.name.contains('Hannah') ||
+                            doctor.name.contains('Brandy');
+                        // Format current date for filtering time slots
+                        final today =
+                        DateFormat('yyyy-MM-dd').format(DateTime.now());
+                        // Get today's time slots with formatted time
+                        String time = doctor.timeSlots
+                            .where((slot) => slot.date == today)
+                            .map((slot) =>
+                        '${slot.startTime.substring(0, 5)}-${slot.endTime.substring(0, 5)}')
+                            .join(', ');
+                        time = time.isEmpty ? 'Not available today' : time;
+                        // Use clinic contact phone as placeholder for location
+                        String location = doctor.clinics.isNotEmpty
+                            ? 'Clinic: ${doctor.clinics[0].contactPhone}'
+                            : 'Unknown location';
+                        // Generate random salary as it's not in API
+                        int salary = 300 + (index * 10);
+                        return Column(
+                          children: [
+                            DoctorCard(
+                              name: doctor.name,
+                              time: time,
+                              location: location,
+                              rating: double.parse(doctor.rating),
+                              salary: salary,
+                              imgUrl:
+                              'https://i.pravatar.cc/150?img=${index + 1}',
+                              isFemale: isFemale,
+                              doctor: doctor,
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             ],
@@ -134,6 +112,7 @@ class DoctorCard extends StatelessWidget {
   final int salary;
   final String imgUrl;
   final bool isFemale;
+  final Doctor doctor;
 
   const DoctorCard({
     super.key,
@@ -144,6 +123,7 @@ class DoctorCard extends StatelessWidget {
     required this.salary,
     required this.imgUrl,
     required this.isFemale,
+    required this.doctor,
   });
 
   @override
@@ -170,7 +150,8 @@ class DoctorCard extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: isFemale ? const Color(0xffFA7CA5) : const Color(0xffFFD1E2),
+                color:
+                isFemale ? const Color(0xffFA7CA5) : const Color(0xffFFD1E2),
                 borderRadius: BorderRadius.circular(10),
                 image: DecorationImage(
                   image: NetworkImage(imgUrl),
@@ -179,7 +160,6 @@ class DoctorCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-
             // Doctor Details
             Expanded(
               child: Column(
@@ -201,11 +181,14 @@ class DoctorCard extends StatelessWidget {
                         color: Color(0xffFA7CA5),
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        time,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
+                      Expanded(
+                        child: Text(
+                          time,
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -219,11 +202,14 @@ class DoctorCard extends StatelessWidget {
                         color: Color(0xffFA7CA5),
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        location,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
+                      Expanded(
+                        child: Text(
+                          location,
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -249,7 +235,6 @@ class DoctorCard extends StatelessWidget {
                 ],
               ),
             ),
-
             // Rating and Arrow
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -257,7 +242,7 @@ class DoctorCard extends StatelessWidget {
               children: [
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
@@ -288,16 +273,16 @@ class DoctorCard extends StatelessWidget {
                     color: const Color(0xffFA7CA5),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child:InkWell(
-              onTap: () {
-                context.push(DoctorDetailScreen());
-              },
-              child: const Icon(
-                Icons.arrow_forward_sharp,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
+                  child: InkWell(
+                    onTap: () {
+                      context.push(DoctorDetailScreen(doctor: doctor));
+                    },
+                    child: const Icon(
+                      Icons.arrow_forward_sharp,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ],
             ),
