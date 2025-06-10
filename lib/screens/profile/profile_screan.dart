@@ -86,7 +86,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         image:
             hasImage
                 ? DecorationImage(
-                  image: NetworkImage(user!.profileImage!),
+                  image: NetworkImage(user.profileImage!),
                   fit: BoxFit.cover,
                 )
                 : null,

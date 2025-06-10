@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/screens/Sign/SignUp/sign_up_succ.dart';
@@ -48,7 +50,7 @@ class _PationCreationState extends State<PationCreation> {
 
       if (response.statusCode == 200) {
         // Handle successful response
-        print('Data received: ${response.data}');
+        log('Data received: ${response.data}');
         // You can parse the response data here
       }
     } on DioException catch (e) {

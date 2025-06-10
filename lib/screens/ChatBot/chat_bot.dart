@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/services/chat_service.dart';
 
 class Message {
   final String text;
@@ -16,27 +17,41 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  final List<Message> _messages = [
-    Message(text: "Hello chatGPT, how are you today?", isUser: true),
-    Message(text: "Hello, I'm fine. how can i help you?", isUser: false),
-    Message(text: "What is the best programming language?", isUser: true),
-    Message(
-      text:
-          "There are many programming languages in the market that are used in designing and building websites",
-      isUser: false,
-    ),
-    Message(text: "So explain to me more", isUser: true),
-    Message(
-      text:
-          "There are many programming languages in the market that are used in designing and building websites, ",
-      isUser: false,
-    ),
-  ];
+  final ChatService _chatService = ChatService();
+  final List<Message> _messages = [];
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _sendMessage() async {
+    if (_controller.text.trim().isEmpty) return;
+
+    final userMessage = _controller.text;
+    setState(() {
+      _messages.add(Message(text: userMessage, isUser: true));
+      _isLoading = true;
+    });
+    _controller.clear();
+
+    try {
+      final response = await _chatService.sendMessage(userMessage);
+      setState(() {
+        _messages.add(Message(text: response, isUser: false));
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _messages.add(Message(
+          text: 'Sorry, there was an error processing your message. Please try again.',
+          isUser: false,
+        ));
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -186,7 +201,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: TextField(
                       controller: _controller,
                       decoration: InputDecoration(
-                        hintText: 'Hello chatGPT, how are you today?',
+                        hintText: 'Type your message...',
                         hintStyle: TextStyle(color: Colors.pink[300]),
                         border: InputBorder.none,
                       ),
@@ -195,21 +210,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   IconButton(
                     icon: Icon(Icons.send, color: Colors.pink[400]),
-                    onPressed: () {
-                      if (_controller.text.trim().isNotEmpty) {
-                        setState(() {
-                          _messages.add(
-                            Message(text: _controller.text, isUser: true),
-                          );
-                          // Clear the text field after sending
-                          _controller.clear();
-                        });
-                      }
-                    },
+                    onPressed: _isLoading ? null : _sendMessage,
                   ),
                   IconButton(
                     icon: Icon(Icons.mic_none_sharp, color: Colors.pink[400]),
-                    onPressed: () {
+                    onPressed: _isLoading ? null : () {
                       // Voice input logic
                     },
                   ),

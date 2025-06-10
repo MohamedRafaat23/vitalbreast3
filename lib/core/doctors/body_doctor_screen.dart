@@ -25,7 +25,7 @@ class _BodyDoctorScreenState extends State<BodyDoctorScreen> {
   }
 
   Future<void> fetchDoctors() async {
-  setState(() {
+    setState(() {
       isLoading = true;
     });
 
@@ -75,10 +75,12 @@ class _BodyDoctorScreenState extends State<BodyDoctorScreen> {
         itemBuilder: (context, index) {
           final doctor = doctors[index];
           return DoctorCard(
-            name: doctor.user ?? 'Unknown',
+            name: doctor.user?.name ?? 'Unknown',
             specialty: doctor.clinics?.firstOrNull?.city ?? 'No specialty',
             rating: doctor.rating ?? '0.0',
-            time: doctor.timeSlots ?? 'Not available',
+            time: doctor.timeSlots?.isNotEmpty == true 
+                ? '${doctor.timeSlots!.first.startTime} - ${doctor.timeSlots!.first.endTime}'
+                : 'Not available',
             isAvailable: doctor.isAvailable ?? false,
           );
         },

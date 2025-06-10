@@ -57,6 +57,9 @@ add_subdirectory("runner")
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
+# Add Flutter include path
+include_directories(${FLUTTER_EPHEMERAL_DIR}/include)
+
 
 # === Installation ===
 # Support files are copied into place next to the executable, so that it can

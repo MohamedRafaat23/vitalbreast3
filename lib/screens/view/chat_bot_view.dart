@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/screens/Sign/SignUp/authentification.dart';
 import 'package:vitalbreast3/screens/view/doctor_view.dart';
-import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
-import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
 
 
 class ChatBotView extends StatelessWidget {
@@ -90,7 +88,7 @@ class ChatBotView extends StatelessWidget {
                 // Centered chat bot image
                 Center(
                   child: SizedBox(
-                    width: 270,
+                    width: 280,
                     child: Image.asset(
                       'assets/7.png',
                       fit: BoxFit.contain,
@@ -98,14 +96,40 @@ class ChatBotView extends StatelessWidget {
                   ),
                 ),
                 
-                SizedBox(height: 120),
+                SizedBox(height: 160),
                 
                 // Next button
-                CustomElevatedButton(
-                  text: 'Next',
-                  onTap: () {
-                    context.push(Authentification());
-                  },
+                Center(
+                  child: Container(
+                    width: double.infinity,
+                    height: 55,
+                    margin: const EdgeInsets.only(bottom: 30),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Authentification(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pinkAccent,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Next',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

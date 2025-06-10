@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/core/doctors/filtered_location.dart';
+import 'package:vitalbreast3/core/doctors/doctor_details.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 
 class DoctorCard extends StatelessWidget {
@@ -59,48 +59,48 @@ class DoctorCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Dr  $name",
+                  "  $name",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  specialty,
-                  style: TextStyle(
-                    color: Colors.grey[600],
                     fontSize: 14,
                   ),
                 ),
+                // const SizedBox(height: 4),
+                // Text(
+                //   specialty,
+                //   style: TextStyle(
+                //     color: Colors.grey[600],
+                //     fontSize: 14,
+                //   ),
+                // ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     const Icon(
                       Icons.star,
                       color: Colors.amber,
-                      size: 16,
+                      size: 14,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       rating,
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Icon(
                       Icons.access_time,
                       color: Colors.grey[600],
-                      size: 16,
+                      size: 15,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       time,
                       style: TextStyle(
                         color: Colors.grey[600],
-                        fontSize: 14,
+                        fontSize: 10,
                       ),
                     ),
                   ],
@@ -118,7 +118,7 @@ class DoctorCard extends StatelessWidget {
                                                    //Button 
             child: InkWell(
               onTap: () {
-                context.push(DoctorListingScreen());
+                context.push(DoctorDetailScreen());
               },
               child: const Icon(
                 Icons.arrow_forward_sharp,
