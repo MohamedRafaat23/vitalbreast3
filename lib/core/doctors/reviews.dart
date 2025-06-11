@@ -9,7 +9,7 @@ class Review {
 }
 
 class DoctorReviewsScreen extends StatefulWidget {
-  final Doctor doctor;
+  final Doctor? doctor;
   const DoctorReviewsScreen({super.key, required this.doctor});
 
   @override
@@ -101,9 +101,9 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
                 ),
                 const SizedBox(height: 12),
                 // Doctor name
-                const Text(
-                  'Dr. Razan Ali',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  widget.doctor!.name,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 // Doctor title

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
 import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
+import 'package:vitalbreast3/core/doctors/reviews.dart';
 import 'package:vitalbreast3/core/doctors/your_appointment.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 import 'package:vitalbreast3/core/models/all.dart';
@@ -50,12 +51,11 @@ class AppointmentScreenState extends State<AppointmentScreen> {
       data: form,
     );
 
-    if(respons.statusCode == 201){
+    if(respons.statusCode == 200){
       final appointment = Appointment.Appointment.fromJson(respons.data);
       print(appointment.desc);
-    }else{
-
     }
+    context.push(DoctorReviewsScreen(doctor: respons.data.doctor,)); //
   }
 
   @override
