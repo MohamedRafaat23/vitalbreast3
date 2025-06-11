@@ -14,6 +14,10 @@ class Message {
   }) : timestamp = timestamp ?? DateTime.now();
 }
 
+void sendMessage(){
+  
+}
+
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 

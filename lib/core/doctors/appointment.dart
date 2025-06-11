@@ -1,8 +1,14 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
+import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
 import 'package:vitalbreast3/core/doctors/your_appointment.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 import 'package:vitalbreast3/core/models/all.dart';
 import 'package:vitalbreast3/core/doctors/doctor_details.dart';
+
+import '../models/appointmint.dart' as Appointment;
+import '../network/api_constant.dart';
 
 class AppointmentScreen extends StatefulWidget {
   final Doctor doctor;
@@ -31,6 +37,26 @@ class AppointmentScreenState extends State<AppointmentScreen> {
     '3:50 PM',
     '4:00 PM'
   ];
+
+  Future<void> _sendAppointment({required String desc}) async {
+    print(user!.id!);
+    final form = FormData.fromMap({
+      'id': user!.id,
+      'desc': desc,
+    });
+
+    final respons = await DioHelper.dio.post(
+      ApiConstant.appointment,
+      data: form,
+    );
+
+    if(respons.statusCode == 201){
+      final appointment = Appointment.Appointment.fromJson(respons.data);
+      print(appointment.desc);
+    }else{
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -346,8 +372,8 @@ class AppointmentScreenState extends State<AppointmentScreen> {
         width: double.infinity,
         height: 50,
         child: ElevatedButton(
-          onPressed: () {
-            context.push(const AppointmentDetailsScreen());
+          onPressed: () async {
+            await _sendAppointment(desc: problemController.text.trim());
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xffFA7CA5),

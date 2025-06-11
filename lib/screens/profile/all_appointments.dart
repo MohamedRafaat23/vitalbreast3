@@ -176,7 +176,7 @@ class AppointmentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    appointment.doctor?.name ?? 'Unknown Doctor',
+                    appointment.doctor?.user ?? 'Unknown Doctor',
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 15,

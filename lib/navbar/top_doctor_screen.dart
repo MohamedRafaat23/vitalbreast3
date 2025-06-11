@@ -48,10 +48,11 @@ class _LayoutMainScreenState extends State<LayoutMainScreen> {
       );
 
       if (response.statusCode == 200) {
-        final user = User.fromJson(response.data);
+        user = User.fromJson(response.data);
+        print(user!.id);
         setState(() {
-          userName = user.name;
-          profileImage = user.profileImage;
+          userName = user!.name;
+          profileImage = user!.profileImage;
         });
       }
     } catch (e) {
