@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/core/doctors/body_doctor_screen.dart';
 import 'package:vitalbreast3/core/doctors/doctors.dart';
 import 'package:vitalbreast3/screens/ChatBot/chat_bot.dart';
 import 'package:vitalbreast3/screens/home/stories_screen.dart';

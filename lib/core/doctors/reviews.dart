@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vitalbreast3/core/models/all.dart';
 
 class Review {
   final String avatarUrl;
@@ -8,7 +9,8 @@ class Review {
 }
 
 class DoctorReviewsScreen extends StatefulWidget {
-  const DoctorReviewsScreen({super.key});
+  final Doctor doctor;
+  const DoctorReviewsScreen({super.key, required this.doctor});
 
   @override
   // ignore: library_private_types_in_public_api

@@ -1,7 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/core/doctors/doctor_details.dart';
-import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 
 class DoctorCard extends StatelessWidget {
   final String name;

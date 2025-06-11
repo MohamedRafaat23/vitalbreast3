@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/doctors/appointment.dart';
 import 'package:vitalbreast3/core/doctors/reviews.dart';
-import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
-import 'package:vitalbreast3/core/models/all.dart'; // Import shared models
+import 'package:vitalbreast3/core/models/all.dart';
+import 'package:vitalbreast3/widgets/context_navigation_extansions.dart'; // Import shared models
 
 class DoctorDetailScreen extends StatelessWidget {
   final Doctor doctor;
@@ -38,7 +38,7 @@ class DoctorDetailScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -47,7 +47,7 @@ class DoctorDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.0),
                 child: Container(
                   width: double.infinity,
-                  height: 250,
+                  height: 240,
                   color: Theme.of(context).primaryColor,
                   child: Image.network(
                     'https://i.pravatar.cc/300?img=${doctor.id.hashCode % 10 + 1}',
@@ -63,7 +63,7 @@ class DoctorDetailScreen extends StatelessWidget {
                   Text(
                     doctor.name,
                     style: const TextStyle(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -78,11 +78,11 @@ class DoctorDetailScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 10),
                       Text(
                         '($reviewsCount reviews)',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 8,
                           color: Colors.grey,
                         ),
                       ),
@@ -132,7 +132,7 @@ class DoctorDetailScreen extends StatelessWidget {
               // Buttons
               ElevatedButton(
                 onPressed: () {
-                 // context.push(AppointmentScreen(doctor: doctor)); // Pass doctor
+                 context.push(AppointmentScreen(doctor: doctor)); // Pass doctor
                 },
                 style: ElevatedButton.styleFrom(
                   side: const BorderSide(color: Colors.white),
@@ -154,7 +154,7 @@ class DoctorDetailScreen extends StatelessWidget {
               const SizedBox(height: 12),
               OutlinedButton(
                 onPressed: () {
-                 // context.push(DoctorReviewsScreen(doctor: doctor)); // Pass doctor
+                 context.push(DoctorReviewsScreen(doctor: doctor)); // Pass doctor
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white),

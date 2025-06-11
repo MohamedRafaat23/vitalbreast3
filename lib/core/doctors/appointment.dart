@@ -1,10 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/doctors/your_appointment.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
+import 'package:vitalbreast3/core/models/all.dart';
+import 'package:vitalbreast3/core/doctors/doctor_details.dart';
 
 class AppointmentScreen extends StatefulWidget {
-  const AppointmentScreen({super.key});
+  final Doctor doctor;
+  const AppointmentScreen({super.key, required this.doctor});
 
   @override
   AppointmentScreenState createState() => AppointmentScreenState();
@@ -63,7 +65,9 @@ class AppointmentScreenState extends State<AppointmentScreen> {
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Color(0xffFA7CA5)),
-            onPressed: () {},
+            onPressed: () {
+              context.push(DoctorDetailScreen(doctor: widget.doctor));
+            },
           ),
           const Expanded(
             child: Center(
