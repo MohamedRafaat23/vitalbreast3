@@ -35,21 +35,20 @@ class DioHelper {
     };
 
     // Add interceptors for logging
-    dio.interceptors.add(LogInterceptor(
-      request: true,
-      requestHeader: true,
-      requestBody: true,
-      responseHeader: true,
-      responseBody: true,
-      error: true,
-    ));
+    dio.interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestHeader: true,
+        requestBody: true,
+        responseHeader: true,
+        responseBody: true,
+        error: true,
+      ),
+    );
   }
 
   static bool checkInterception(X509Certificate cert, String host, int port) {
-    const trustedIssuers = [
-      'Trusted Issuer 1',
-      'Trusted Issuer 2',
-    ];
+    const trustedIssuers = ['Trusted Issuer 1', 'Trusted Issuer 2'];
 
     return !trustedIssuers.contains(cert.issuer);
   }
@@ -60,7 +59,11 @@ class DioHelper {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    return await dio.get(url, queryParameters: queryParameters, options: options);
+    return await dio.get(
+      url,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   static Future<Response> post({
@@ -69,7 +72,12 @@ class DioHelper {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    return await dio.post(url, data: data, queryParameters: queryParameters, options: options);
+    return await dio.post(
+      url,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   static Future<Response> put({
@@ -78,7 +86,26 @@ class DioHelper {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    return await dio.put(url, data: data, queryParameters: queryParameters, options: options);
+    return await dio.put(
+      url,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
+  }
+
+  static Future<Response> patch({
+    required String url,
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return await dio.patch(
+      url,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   static Future<Response> delete({
@@ -87,6 +114,11 @@ class DioHelper {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    return await dio.delete(url, data: data, queryParameters: queryParameters, options: options);
+    return await dio.delete(
+      url,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 }

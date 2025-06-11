@@ -95,8 +95,8 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
                     color: Colors.pink[100],
                     image: const DecorationImage(
                       fit: BoxFit.cover,
-                      image: AssetImage('assets/doctor.png'),
-                    ),
+                      image: AssetImage('assets/5.png'),
+                    )
                   ),
                 ),
                 const SizedBox(height: 12),

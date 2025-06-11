@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
-import 'package:vitalbreast3/screens/profile/all_appointments.dart';
+import 'package:vitalbreast3/screens/Sign/SignUp/authentification.dart';
+ import 'package:vitalbreast3/screens/profile/all_appointments.dart';
 import 'package:vitalbreast3/screens/profile/my_profile.dart';
 import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
 import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
-import 'package:vitalbreast3/core/network/api_constant.dart';
 import 'package:vitalbreast3/core/models/user.dart';
 import 'dart:ui';
 import 'package:dio/dio.dart';
+import 'package:vitalbreast3/widgets/navigateion.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -31,8 +31,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _fetchProfileData() async {
     try {
-      final response = await DioHelper.dio.get(
-        '${ApiConstant.baseUrl}/accounts/auth/users/me/',
+      final response = await DioHelper.get(
+       url:  '/accounts/auth/users/me/',
         options: Options(
           headers: {
             'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
@@ -64,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _logout() async {
     await CasheHelper.removeData(key: 'token');
     if (!mounted) return;
-    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+    context.pushNamedAndRemoveUntil( Authentification.id );
   }
 
   @override
@@ -296,7 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                     ),
-                                    child: const Text('Yes, Log Out'),
+                                    child: const Text('Log Out' ,maxLines: 1, overflow: TextOverflow.ellipsis,),
                                   ),
                                 ),
                               ],

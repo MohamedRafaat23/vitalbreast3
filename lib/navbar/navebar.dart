@@ -34,7 +34,7 @@
 
 //   Future<void> fetchUser() async {
 //     try {
-//       final response = await DioHelper.dio.get(
+//       final response = awaitDioHelper.get(
 //         '${ApiConstant.baseUrl}/accounts/auth/users/me/',
 //         options: Options(
 //           headers: {

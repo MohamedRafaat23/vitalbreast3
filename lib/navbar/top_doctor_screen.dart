@@ -1,12 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/doctors/doctors.dart';
 import 'package:vitalbreast3/screens/ChatBot/chat_bot.dart';
 import 'package:vitalbreast3/screens/home/stories_screen.dart';
 import 'package:vitalbreast3/screens/profile/profile_screan.dart';
 import 'package:vitalbreast3/screens/scanner/scanner.dart';
-import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
-import 'package:vitalbreast3/core/network/api_constant.dart';
 import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
 import 'package:vitalbreast3/core/models/user.dart';
 import 'package:dio/dio.dart';
@@ -34,12 +34,16 @@ class _LayoutMainScreenState extends State<LayoutMainScreen> {
 
   Future<void> fetchUserName() async {
     try {
-      final response = await DioHelper.dio.get(
-        '${ApiConstant.baseUrl}/accounts/auth/users/me/',
+      final token = CasheHelper.getData(key: 'token');
+      log('$token -------------------------------------------');
+
+      final response = await DioHelper.get(
+      url:   '/accounts/auth/users/me/',
         options: Options(
-          headers: {
-            'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
-          },
+       headers: {
+  'Authorization': 'Token $token',
+}
+
         ),
       );
 
@@ -103,14 +107,14 @@ class _LayoutMainScreenState extends State<LayoutMainScreen> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.location_on, color: Colors.grey),
-            onPressed: () {
-              context.push( DoctorListingScreen());
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.location_on, color: Colors.grey),
+        //     onPressed: () {
+        //       context.push( DoctorListingScreen());
+        //     },
+        //   ),
+        // ],
       ),
       body: screenList[index],
       bottomNavigationBar: BottomNavigationBar(

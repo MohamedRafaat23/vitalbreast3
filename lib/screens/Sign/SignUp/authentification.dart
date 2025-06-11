@@ -6,7 +6,8 @@ import 'package:vitalbreast3/screens/Sign/SignUp/sign_up_view.dart';
 
 class Authentification extends StatelessWidget {
   const Authentification({super.key});
-
+  static String id = 'Authentification';
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

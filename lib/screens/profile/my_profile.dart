@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/data/local/cashe_helper.dart';
 import '../../../core/data/remote/dio_helper.dart';
 import '../../../core/models/user.dart';
-import '../../../core/network/api_constant.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -40,8 +39,8 @@ class _ProfileScreenState extends State<MyProfileScreen> {
   Future<void> _fetchProfileData() async {
     setState(() => _isLoading = true);
     try {
-      final response = await DioHelper.dio.get(
-        '${ApiConstant.baseUrl}/accounts/auth/users/me/',
+      final response = await DioHelper.get(
+        url: '/accounts/auth/users/me/',
         options: Options(
           headers: {
             'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
@@ -107,8 +106,8 @@ class _ProfileScreenState extends State<MyProfileScreen> {
     try {
       print('👁 Uploaded Image URL: $_uploadedImageUrl');
 
-      final response = await DioHelper.dio.patch(
-        '${ApiConstant.baseUrl}/accounts/auth/users/me/',
+      final response = await DioHelper.patch(
+      url:  '/accounts/auth/users/me/',
         data: {
           'name': _profileData['Full Name'],
           'phone': _profileData['Phone Number'],

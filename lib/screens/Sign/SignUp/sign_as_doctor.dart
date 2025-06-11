@@ -50,7 +50,7 @@ class _DoctorCreationState extends State<DoctorCreation> {
 });
 
 
-      final response = await DioHelper.dio.post(ApiConstant.signup, data: form);
+      final response = await DioHelper.post(url :ApiConstant.signup, data: form);
 
       if (response.statusCode == 201) {
         user = User.fromJson(response.data);

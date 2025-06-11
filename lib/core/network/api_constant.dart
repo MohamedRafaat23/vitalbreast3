@@ -6,10 +6,7 @@ class ApiConstant {
   static const String doctor = "/clinic/doctors/";
   static const String chat = "/chat/ask-google/";
   static const String appointment = "/clinic/appointments/";
-  
-
-
-  
+   
   static const String city = "/city/";
 
 }

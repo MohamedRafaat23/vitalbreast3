@@ -39,8 +39,8 @@ class _PationCreationState extends State<PationCreation> {
     });
 
     try {
-      final response = await DioHelper.dio.get(
-        ApiConstant.signup,
+      final response = await DioHelper.get(
+      url:   ApiConstant.signup,
         options: Options(
           headers: {
             'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
@@ -99,7 +99,7 @@ class _PationCreationState extends State<PationCreation> {
         'role': 'patient',
       });
 
-      final response = await DioHelper.dio.post(ApiConstant.signup, data: form);
+      final response = await DioHelper.post(url:ApiConstant.signup, data: form);
 
       if (response.statusCode == 201) {
         user = User.fromJson(response.data);

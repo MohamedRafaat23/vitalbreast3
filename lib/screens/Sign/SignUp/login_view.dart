@@ -33,8 +33,8 @@ class _LoginViewState extends State<LoginView> {
     });
 
     try {
-      final response = await DioHelper.dio.post(
-        ApiConstant.login,
+      final response = await DioHelper.post(
+url:        ApiConstant.login,
         data: {
           'email': emailcontroller.text.trim(),
           'password': passwordcontroller.text.trim(),

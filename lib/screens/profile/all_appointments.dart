@@ -1,41 +1,50 @@
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
+import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
+import 'package:vitalbreast3/core/models/appointmint.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 import 'package:vitalbreast3/screens/profile/cancel_appointment.dart';
 import 'package:vitalbreast3/screens/profile/patient_details.dart';
-
-
-
-class Appointment {
-  final String name;
-  final String date;
-  final String time;
-  final String imageUrl;
-
-  Appointment({
-    required this.name,
-    required this.date,
-    required this.time,
-    required this.imageUrl,
-  });
-}
-
-class AllAppointmentsScreen extends StatelessWidget {
+ 
+class AllAppointmentsScreen extends StatefulWidget {
   const AllAppointmentsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Sample data for appointments
-    final List<Appointment> appointments = List.generate(
-      6, // Generate 6 items as shown in the image
-      (index) => Appointment(
-        name: 'Aliaa Ahmed',
-        date: '12 FEB 2025',
-        time: '11:00 am',
-        imageUrl: 'https://via.placeholder.com/150',
-      ),
-    );
+  State<AllAppointmentsScreen> createState() => _AllAppointmentsScreenState();
+}
 
+class _AllAppointmentsScreenState extends State<AllAppointmentsScreen> {  
+  late Future<List<Appointment>> _appointmentsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAppointments();
+  }
+ Future<void> fetchAppointments() async {
+    try {
+      final response = await DioHelper.get(
+        url:  "/clinic/appointments/",
+        options: Options(
+            // ...
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ${CasheHelper.getData(key: "token")}',
+            }
+        ));
+
+      if (response.statusCode == 200) {
+          _appointmentsFuture = response.data;
+       } else {
+        throw Exception('Failed to load appointments');
+      }
+    } catch (e) {
+      throw Exception('Error fetching appointments: $e');
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -69,12 +78,25 @@ class AllAppointmentsScreen extends StatelessWidget {
 
             // Appointment List
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: appointments.length,
-                itemBuilder: (context, index) {
-                  return AppointmentCard(
-                    appointment: appointments[index],
+              child: FutureBuilder<List<Appointment>>(
+                future: _appointmentsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('No appointments found'));
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return AppointmentCard(
+                        appointment: snapshot.data![index],
+                      );
+                    },
                   );
                 },
               ),
@@ -130,7 +152,7 @@ class AppointmentCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(25),
                   child: Image.network(
-                    appointment.imageUrl,
+                   "https://images.unsplash.comfDB8fHx8&auto=format&fit=crop&w=687&q=80",
                     width: 46,
                     height: 46,
                     fit: BoxFit.cover,
@@ -154,7 +176,7 @@ class AppointmentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    appointment.name,
+                    appointment.doctor?.name ?? 'Unknown Doctor',
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 15,
@@ -162,7 +184,7 @@ class AppointmentCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '${appointment.date}   ${appointment.time}',
+                    '${appointment.timeSlot?.date ?? 'No date'}   ${appointment.timeSlot?.startTime ?? 'No time'}',
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 12,
@@ -181,7 +203,6 @@ class AppointmentCard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       context.push(const PatientDetailsScreen());
-                      // Handle details action
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: lightPink,
@@ -210,7 +231,6 @@ class AppointmentCard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       context.push(const CancelAppointmentScreen());
-                      // Handle cancel action
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xffFA7CA5),

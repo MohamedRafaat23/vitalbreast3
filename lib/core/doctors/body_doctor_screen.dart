@@ -30,8 +30,8 @@ class _BodyDoctorScreenState extends State<BodyDoctorScreen> {
     });
 
     try {
-      final response = await DioHelper.dio.get(
-        ApiConstant.doctor,
+      final response = await DioHelper.get(
+     url:    ApiConstant.doctor,
         options: Options(
           headers: {
             'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
