@@ -20,7 +20,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   Map<String, dynamic>? _results;
   bool _showResults = false;
 
-  static const String apiUrl = 'https://f466-156-199-53-176.ngrok-free.app/predict';
+  static const String apiUrl = 'https://c7ee-156-199-124-190.ngrok-free.app';
 
   Future<void> _uploadImage(String imagePath) async {
     if (!mounted) return;
