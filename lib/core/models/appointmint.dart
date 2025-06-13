@@ -23,11 +23,11 @@ class Appointment {
   Appointment.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     doctor =
-        json['doctor'] != null ? new Doctor.fromJson(json['doctor']) : null;
+        json['doctor'] != null ? Doctor.fromJson(json['doctor']) : null;
     patient =
-        json['patient'] != null ? new Patient.fromJson(json['patient']) : null;
+        json['patient'] != null ? Patient.fromJson(json['patient']) : null;
     timeSlot = json['time_slot'] != null
-        ? new TimeSlot.fromJson(json['time_slot'])
+        ? TimeSlot.fromJson(json['time_slot'])
         : null;
     status = json['status'];
     city = json['city'];
@@ -37,22 +37,22 @@ class Appointment {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    if (this.doctor != null) {
-      data['doctor'] = this.doctor!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    if (doctor != null) {
+      data['doctor'] = doctor!.toJson();
     }
-    if (this.patient != null) {
-      data['patient'] = this.patient!.toJson();
+    if (patient != null) {
+      data['patient'] = patient!.toJson();
     }
-    if (this.timeSlot != null) {
-      data['time_slot'] = this.timeSlot!.toJson();
+    if (timeSlot != null) {
+      data['time_slot'] = timeSlot!.toJson();
     }
-    data['status'] = this.status;
-    data['city'] = this.city;
-    data['desc'] = this.desc;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
+    data['status'] = status;
+    data['city'] = city;
+    data['desc'] = desc;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }
@@ -90,7 +90,7 @@ class Doctor {
     if (json['clinics'] != null) {
       clinics = <Clinics>[];
       json['clinics'].forEach((v) {
-        clinics!.add(new Clinics.fromJson(v));
+        clinics!.add(Clinics.fromJson(v));
       });
     }
     rating = json['rating'];
@@ -100,19 +100,19 @@ class Doctor {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['user'] = this.user;
-    data['experience_years'] = this.experienceYears;
-    data['time_slots'] = this.timeSlots;
-    data['reviews_count'] = this.reviewsCount;
-    if (this.clinics != null) {
-      data['clinics'] = this.clinics!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['user'] = user;
+    data['experience_years'] = experienceYears;
+    data['time_slots'] = timeSlots;
+    data['reviews_count'] = reviewsCount;
+    if (clinics != null) {
+      data['clinics'] = clinics!.map((v) => v.toJson()).toList();
     }
-    data['rating'] = this.rating;
-    data['patient_count'] = this.patientCount;
-    data['is_available'] = this.isAvailable;
-    data['city'] = this.city;
+    data['rating'] = rating;
+    data['patient_count'] = patientCount;
+    data['is_available'] = isAvailable;
+    data['city'] = city;
     return data;
   }
 }
@@ -133,11 +133,11 @@ class Clinics {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['doctor'] = this.doctor;
-    data['city'] = this.city;
-    data['contact_phone'] = this.contactPhone;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['doctor'] = doctor;
+    data['city'] = city;
+    data['contact_phone'] = contactPhone;
     return data;
   }
 }
@@ -154,9 +154,9 @@ class Patient {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['user'] = this.user;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['user'] = user;
     return data;
   }
 }
@@ -177,11 +177,11 @@ class TimeSlot {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['date'] = this.date;
-    data['start_time'] = this.startTime;
-    data['end_time'] = this.endTime;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['date'] = date;
+    data['start_time'] = startTime;
+    data['end_time'] = endTime;
     return data;
   }
 }

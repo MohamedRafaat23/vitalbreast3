@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +16,7 @@ class TweetsScreen extends StatefulWidget {
 
 class _TweetsScreenState extends State<TweetsScreen> {
   final TextEditingController _commentController = TextEditingController();
-  final Dio _dio = Dio();
+
   List<dynamic> tweets = [];
   bool _isLoading = true;
   String errorMessage = '';
@@ -28,13 +31,14 @@ class _TweetsScreenState extends State<TweetsScreen> {
     setState(() {
       _isLoading = true;
     });
+    final token = await CasheHelper.getData(key: 'token');
 
     try {
       final response = await DioHelper.get(
         url: '/tweets/stories/',
         options: Options(
           headers: {
-            'Authorization': 'Bearer ${CasheHelper.getData(key: 'token')}',
+            'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
           },
         ),
@@ -46,7 +50,17 @@ class _TweetsScreenState extends State<TweetsScreen> {
           _isLoading = false;
         });
       } else {
-        throw Exception('Failed to load tweets');
+        setState(() {
+          _isLoading = false;
+          errorMessage = 'Error: ${response.statusCode}';
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to load tweets: ${response.statusCode}'),
+            ),
+          );
+        }
       }
     } catch (e) {
       setState(() {
@@ -54,29 +68,47 @@ class _TweetsScreenState extends State<TweetsScreen> {
         errorMessage = 'Error: $e';
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load tweets: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to load tweets: $e')));
       }
     }
   }
 
-  void _addTweet() {
+  Future<void> _addTweet() async {
+    final token = await CasheHelper.getData(key: 'token');
+log("Token: $token");
+
     if (_commentController.text.isNotEmpty) {
-      // Here you can add API call to post new tweet
-      setState(() {
-        tweets.insert(0, {
-          'id': DateTime.now().millisecondsSinceEpoch.toString(),
-          'author': {
-            'name': 'Me',
-          },
-          'content': _commentController.text,
-          'num_of_likes': 0,
-          'num_of_comments': 0,
-          'created_at': DateTime.now().toIso8601String(),
+final response = await DioHelper.post(
+  url: '/tweets/stories/',
+  data: {
+    "content": _commentController.text,
+  },
+  options: Options(
+    headers: {
+      'Authorization': 'Bearer $token',
+ 
+    },
+  ),
+);
+log("Response status: ${response.statusCode}");
+log("Response data: ${response.data}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        setState(() {
+          _commentController.clear();
+          _fetchTweets();
         });
-        _commentController.clear();
-      });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add tweet: ${response.data}')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Please enter a comment')));
     }
   }
 
@@ -91,83 +123,85 @@ class _TweetsScreenState extends State<TweetsScreen> {
     return _isLoading
         ? const Center(child: CircularProgressIndicator())
         : Scaffold(
-            body: SafeArea(
-              child: Column(
-                children: [
-                  // Tweets list
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: tweets.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: TweetCard(
-                            tweet: tweets[index],
-                            onLikePressed: () {
-                              setState(() {
-                                tweets[index]['num_of_likes']++;
-                              });
-                            },
-                            onRepliesPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RepliesScreen(tweet: tweets[index]),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  // Add tweet input field with send button
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xffFFD1E2),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: TextField(
-                              controller: _commentController,
-                              decoration: const InputDecoration(
-                                hintText: 'Add your tweet here',
-                                border: InputBorder.none,
-                                hintStyle: TextStyle(color: Colors.black45),
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Tweets list
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: tweets.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: TweetCard(
+                          tweet: tweets[index],
+                          onLikePressed: () {
+                            setState(() {
+                              tweets[index]['num_of_likes']++;
+                            });
+                          },
+                          onRepliesPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        RepliesScreen(tweet: tweets[index]),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: _addTweet,
-                          child: Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: Colors.pink[300],
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.send,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                ],
-              ),
+                ),
+
+                // Add tweet input field with send button
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xffFFD1E2),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: TextField(
+                            controller: _commentController,
+                            decoration: const InputDecoration(
+                              hintText: 'Add your tweet here',
+                              border: InputBorder.none,
+                              hintStyle: TextStyle(color: Colors.black45),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: _addTweet,
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.pink[300],
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.send,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          );
+          ),
+        );
   }
 }
 
@@ -228,10 +262,7 @@ class TweetCard extends StatelessWidget {
           // Date
           Text(
             formattedDate,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
           const SizedBox(height: 8),
 
@@ -360,19 +391,13 @@ class _RepliesScreenState extends State<RepliesScreen> {
         replies = [
           {
             'id': '1',
-            'author': {
-              'name': 'User One',
-              'email': 'user1@example.com',
-            },
+            'author': {'name': 'User One', 'email': 'user1@example.com'},
             'content': 'This is a sample reply to the tweet.',
             'created_at': '2023-06-15T10:30:00Z',
           },
           {
             'id': '2',
-            'author': {
-              'name': 'User Two',
-              'email': 'user2@example.com',
-            },
+            'author': {'name': 'User Two', 'email': 'user2@example.com'},
             'content': 'Another interesting perspective on this topic!',
             'created_at': '2023-06-15T11:45:00Z',
           },
@@ -393,10 +418,7 @@ class _RepliesScreenState extends State<RepliesScreen> {
         'https://engmohamedshr18.pythonanywhere.com/tweets/stories/${widget.tweet['id']}/replies/',
         data: {
           'content': _replyController.text,
-          'author': {
-            'id': 'current-user-id',
-            'name': 'Current User',
-          },
+          'author': {'id': 'current-user-id', 'name': 'Current User'},
         },
       );
 
@@ -405,9 +427,9 @@ class _RepliesScreenState extends State<RepliesScreen> {
         _fetchReplies(); // Refresh the replies list
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send reply: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to send reply: $e')));
     } finally {
       setState(() {
         isSending = false;
@@ -420,9 +442,7 @@ class _RepliesScreenState extends State<RepliesScreen> {
       setState(() {
         replies.add({
           'id': DateTime.now().millisecondsSinceEpoch.toString(),
-          'author': {
-            'name': 'Me',
-          },
+          'author': {'name': 'Me'},
           'content': _replyController.text,
           'created_at': DateTime.now().toIso8601String(),
         });
@@ -480,7 +500,9 @@ class _RepliesScreenState extends State<RepliesScreen> {
                       radius: 20,
                       backgroundColor: Colors.pink[100],
                       child: Text(
-                        widget.tweet['author']['name'][0].toString().toUpperCase(),
+                        widget.tweet['author']['name'][0]
+                            .toString()
+                            .toUpperCase(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -512,18 +534,19 @@ class _RepliesScreenState extends State<RepliesScreen> {
 
             // Replies List
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: replies.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: ReplyCard(reply: replies[index]),
-                        );
-                      },
-                    ),
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: replies.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: ReplyCard(reply: replies[index]),
+                          );
+                        },
+                      ),
             ),
 
             // Reply Input (same design as tweet input)
@@ -557,20 +580,21 @@ class _RepliesScreenState extends State<RepliesScreen> {
                         color: isSending ? Colors.grey : Colors.pink[300],
                         shape: BoxShape.circle,
                       ),
-                      child: isSending
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
+                      child:
+                          isSending
+                              ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Icon(
+                                Icons.send,
                                 color: Colors.white,
-                                strokeWidth: 2,
+                                size: 24,
                               ),
-                            )
-                          : const Icon(
-                              Icons.send,
-                              color: Colors.white,
-                              size: 24,
-                            ),
                     ),
                   ),
                 ],
@@ -586,10 +610,7 @@ class _RepliesScreenState extends State<RepliesScreen> {
 class ReplyCard extends StatelessWidget {
   final dynamic reply;
 
-  const ReplyCard({
-    super.key,
-    required this.reply,
-  });
+  const ReplyCard({super.key, required this.reply});
 
   @override
   Widget build(BuildContext context) {
@@ -602,7 +623,11 @@ class ReplyCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.3), spreadRadius: 1, blurRadius: 5),
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 5,
+          ),
         ],
       ),
       child: Column(
@@ -636,10 +661,7 @@ class ReplyCard extends StatelessWidget {
           // Date
           Text(
             formattedDate,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
           const SizedBox(height: 12),
 
