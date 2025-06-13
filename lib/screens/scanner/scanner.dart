@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
+import 'package:dio/dio.dart';
+import 'dart:io';
+import 'package:http_parser/http_parser.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -11,256 +12,234 @@ class ScannerScreen extends StatefulWidget {
 }
 
 class _ScannerScreenState extends State<ScannerScreen> {
-  CameraController? _cameraController;
-  bool _isCameraInitialized = false;
-  String? _errorMessage;
+  File? _selectedImage;
+  String? _apiResult;
+  bool _isLoading = false;
   final ImagePicker _picker = ImagePicker();
+  final Dio _dio = Dio();
 
-  @override
-  void initState() {
-    super.initState();
-    _initCamera();
-  }
-
-  Future<void> _initCamera() async {
+  Future<void> _pickImage() async {
     try {
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) {
-        setState(() {
-          _errorMessage = 'No cameras found on device';
-        });
-        return;
-      }
+      setState(() {
+        _isLoading = true;
+        _apiResult = null;
+      });
 
-      final backCamera = cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.back,
-        orElse: () => cameras.first,
-      );
-
-      _cameraController = CameraController(
-        backCamera,
-        ResolutionPreset.medium,
-        enableAudio: false,
-      );
-
-      await _cameraController?.initialize();
-      if (mounted) {
-        setState(() {
-          _isCameraInitialized = true;
-          _errorMessage = null;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = 'Failed to initialize camera: $e';
-        });
-      }
-    }
-  }
-
-  Future<void> _pickImageFromGallery() async {
-    try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: 80,
+        imageQuality: 85,
       );
-      
+
       if (image != null) {
-        debugPrint('Image selected from gallery: ${image.path}');
-        // TODO: Handle the selected image
-        // You might want to navigate to a preview screen or process the image
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Image selected: ${image.name}')),
-          );
-        }
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+
+        await _uploadImage(_selectedImage!);
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error selecting image: $e')),
-        );
-      }
+      setState(() {
+        _apiResult = 'حدث خطأ: ${e.toString()}';
+        print(_apiResult);
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  Future<void> _takePicture() async {
-    if (_cameraController != null && _cameraController!.value.isInitialized) {
-      try {
-        final XFile file = await _cameraController!.takePicture();
-        debugPrint('Picture saved to: ${file.path}');
-        // TODO: Handle the captured image
-        // You might want to navigate to a preview screen or process the image
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error taking picture: $e')),
-          );
+  Future<void> _uploadImage(File image) async {
+    try {
+      String fileName = image.path.split('/').last;
+      String fileExtension = fileName.split('.').last.toLowerCase();
+
+      // تحديد نوع المحتوى بناء على امتداد الملف
+      MediaType contentType;
+      if (fileExtension == 'png') {
+        contentType = MediaType('image', 'png');
+      } else if (fileExtension == 'gif') {
+        contentType = MediaType('image', 'gif');
+      } else {
+        // الافتراضي jpeg
+        contentType = MediaType('image', 'jpeg');
+      }
+
+      FormData formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          image.path,
+          filename: fileName,
+          contentType: contentType,
+        ),
+      });
+
+      var response = await _dio.post(
+        'https://your-api-url.com/predict',
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          validateStatus: (status) => status! < 500,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        // تحسين معالجة الاستجابة
+        String result = _parseApiResponse(response.data);
+        setState(() {
+          _apiResult = result;
+        });
+      } else {
+        setState(() {
+          _apiResult = 'خطأ في السيرفر (${response.statusCode})';
+          print(_apiResult);
+        });
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'خطأ في الشبكة';
+      if (e.response != null) {
+        errorMessage += ': ${e.response?.statusCode}';
+        if (e.response?.data != null) {
+          errorMessage += ' - ${e.response?.data.toString()}';
+        }
+      } else {
+        errorMessage += ': ${e.message}';
+      }
+      setState(() {
+        _apiResult = errorMessage;
+      });
+    } catch (e) {
+      setState(() {
+        _apiResult = 'خطأ غير متوقع: ${e.toString()}';
+        print(_apiResult);
+      });
+    }
+  }
+
+  String _parseApiResponse(dynamic response) {
+    try {
+      if (response == null) return 'لا توجد استجابة من الخادم';
+
+      if (response is String) {
+        // إذا كانت الاستجابة نصية مباشرة
+        return response;
+      } else if (response is Map) {
+        // إذا كانت الاستجابة كائن JSON
+        if (response.containsKey('result')) {
+          return _translateResult(response['result'].toString());
+        } else if (response.containsKey('message')) {
+          return response['message'].toString();
+        } else if (response.containsKey('error')) {
+          return response['error'].toString();
         }
       }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Camera not initialized')),
-        );
-      }
+
+      return response.toString();
+    } catch (e) {
+      return 'لا يمكن تفسير النتيجة: ${e.toString()}';
     }
   }
 
-  @override
-  void dispose() {
-    _cameraController?.dispose();
-    super.dispose();
+  String _translateResult(String result) {
+    result = result.toLowerCase();
+    if (result.contains('normal')) return 'طبيعي';
+    if (result.contains('abnormal')) return 'غير طبيعي';
+    if (result.contains('positive')) return 'إيجابي';
+    if (result.contains('negative')) return 'سلبي';
+    return result;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.only(top: 30, bottom: 20),
-            width: double.infinity,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey,
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
+      appBar: AppBar(
+        title: const Text('ماسح الأشعة'),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // عرض الصورة المختارة
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
-            ),
-            child: const Text(
-              'Scanner',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          const Divider(height: 1, color: Color.fromARGB(255, 116, 116, 116)),
-
-          // Scanner Area
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(25),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  if (_errorMessage != null)
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                          const SizedBox(height: 16),
-                          Text(
-                            _errorMessage!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                        ],
+                child: _selectedImage != null
+                    ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    _selectedImage!,
+                    fit: BoxFit.contain,
+                  ),
+                )
+                    : Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.image_search, size: 60, color: Colors.grey),
+                      const SizedBox(height: 16),
+                      Text(
+                        'لم يتم اختيار صورة بعد',
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                    )
-                  else if (_isCameraInitialized)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: CameraPreview(_cameraController!),
-                    )
-                  else
-                    const Center(child: CircularProgressIndicator()),
-
-                  // Scanner frame
-                  if (_isCameraInitialized)
-                    CustomPaint(
-                      size: const Size(250, 250),
-                      painter: ScannerFramePainter(),
-                    ),
-                ],
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
 
-          // Upload Button Area
-          Container(
-            padding: const EdgeInsets.all(20),
-            color: Colors.pink[50],
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.cloud_upload_outlined,
-                  size: 30,
-                  color: Colors.black,
-                ),
-                const SizedBox(height: 16),
-                // Take Picture Button
-                CustomElevatedButton(
-                  text: 'Take Picture',
-                  onTap: _takePicture,
-                ),
-                const SizedBox(height: 12),
-                // Gallery Button
-                CustomElevatedButton(
-                  text: 'Choose from Gallery',
-                  onTap: _pickImageFromGallery,
-                ),
-              ],
+            const SizedBox(height: 20),
+
+            // زر اختيار الصورة
+            ElevatedButton(
+              onPressed: _isLoading ? null : _pickImage,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: _isLoading
+                  ? const CircularProgressIndicator()
+                  : const Text('اختر صورة من المعرض'),
             ),
-          ),
-        ],
+
+            const SizedBox(height: 20),
+
+            // عرض نتيجة التحليل
+            if (_apiResult != null)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: _apiResult!.contains('غير طبيعي') || _apiResult!.contains('خطأ')
+                      ? Colors.red.withOpacity(0.1)
+                      : Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: _apiResult!.contains('غير طبيعي') || _apiResult!.contains('خطأ')
+                        ? Colors.red
+                        : Colors.green,
+                  ),
+                ),
+                child: Text(
+                  _apiResult!.startsWith('نتيجة التحليل:')
+                      ? _apiResult!
+                      : 'نتيجة التحليل: $_apiResult',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _apiResult!.contains('غير طبيعي') || _apiResult!.contains('خطأ')
+                        ? Colors.red
+                        : Colors.green,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+          ],
+        ),
       ),
     );
-  }
-}
-
-class ScannerFramePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.black
-          ..strokeWidth = 2
-          ..style = PaintingStyle.stroke;
-
-    final width = size.width;
-    final height = size.height;
-    final cornerSize = 30.0;
-
-    // Top-left corner
-    // canvas.drawLine(const Offset(0, 0), Offset(cornerSize, 0), paint);
-    // canvas.drawLine(const Offset(0, 0), Offset(0, cornerSize), paint);
-
-    // // Top-right corner
-    // canvas.drawLine(Offset(width - cornerSize, 0), Offset(width, 0), paint);
-    // canvas.drawLine(Offset(width, 0), Offset(width, cornerSize), paint);
-
-    // // Middle horizontal line
-    // canvas.drawLine(Offset(0, height / 2), Offset(width, height / 2), paint);
-
-    // // Bottom-left corner
-    // canvas.drawLine(Offset(0, height - cornerSize), Offset(0, height), paint);
-    // canvas.drawLine(Offset(0, height), Offset(cornerSize, height), paint);
-
-    // Bottom-right corner
-    // canvas.drawLine(
-    //   Offset(width - cornerSize, height),
-    //   Offset(width, height),
-    //   paint,
-    // );
-    // canvas.drawLine(
-    //   Offset(width, height - cornerSize),
-    //   Offset(width, height),
-    //   paint,
-    // );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }
