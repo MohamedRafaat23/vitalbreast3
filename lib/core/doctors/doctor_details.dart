@@ -54,7 +54,7 @@ class DoctorDetailScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-              ),
+              ), 
               const SizedBox(height: 16),
               // Doctor Info
               Row(
