@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vitalbreast3/widgets/custom_elevated_button.dart';
 
 class ScannerScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
   String? _errorMessage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -53,6 +55,55 @@ class _ScannerScreenState extends State<ScannerScreen> {
         setState(() {
           _errorMessage = 'Failed to initialize camera: $e';
         });
+      }
+    }
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+      
+      if (image != null) {
+        debugPrint('Image selected from gallery: ${image.path}');
+        // TODO: Handle the selected image
+        // You might want to navigate to a preview screen or process the image
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Image selected: ${image.name}')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error selecting image: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _takePicture() async {
+    if (_cameraController != null && _cameraController!.value.isInitialized) {
+      try {
+        final XFile file = await _cameraController!.takePicture();
+        debugPrint('Picture saved to: ${file.path}');
+        // TODO: Handle the captured image
+        // You might want to navigate to a preview screen or process the image
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error taking picture: $e')),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Camera not initialized')),
+        );
       }
     }
   }
@@ -147,30 +198,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   color: Colors.black,
                 ),
                 const SizedBox(height: 16),
+                // Take Picture Button
                 CustomElevatedButton(
                   text: 'Take Picture',
-                  onTap: () async {
-                    if (_cameraController != null && _cameraController!.value.isInitialized) {
-                      try {
-                        final XFile file = await _cameraController!.takePicture();
-                        debugPrint('Picture saved to: ${file.path}');
-                        // TODO: Handle the captured image
-                        // You might want to navigate to a preview screen or process the image
-                      } catch (e) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error taking picture: $e')),
-                          );
-                        }
-                      }
-                    } else {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Camera not initialized')),
-                        );
-                      }
-                    }
-                  },
+                  onTap: _takePicture,
+                ),
+                const SizedBox(height: 12),
+                // Gallery Button
+                CustomElevatedButton(
+                  text: 'Choose from Gallery',
+                  onTap: _pickImageFromGallery,
                 ),
               ],
             ),
@@ -195,31 +232,31 @@ class ScannerFramePainter extends CustomPainter {
     final cornerSize = 30.0;
 
     // Top-left corner
-    canvas.drawLine(const Offset(0, 0), Offset(cornerSize, 0), paint);
-    canvas.drawLine(const Offset(0, 0), Offset(0, cornerSize), paint);
+    // canvas.drawLine(const Offset(0, 0), Offset(cornerSize, 0), paint);
+    // canvas.drawLine(const Offset(0, 0), Offset(0, cornerSize), paint);
 
-    // Top-right corner
-    canvas.drawLine(Offset(width - cornerSize, 0), Offset(width, 0), paint);
-    canvas.drawLine(Offset(width, 0), Offset(width, cornerSize), paint);
+    // // Top-right corner
+    // canvas.drawLine(Offset(width - cornerSize, 0), Offset(width, 0), paint);
+    // canvas.drawLine(Offset(width, 0), Offset(width, cornerSize), paint);
 
-    // Middle horizontal line
-    canvas.drawLine(Offset(0, height / 2), Offset(width, height / 2), paint);
+    // // Middle horizontal line
+    // canvas.drawLine(Offset(0, height / 2), Offset(width, height / 2), paint);
 
-    // Bottom-left corner
-    canvas.drawLine(Offset(0, height - cornerSize), Offset(0, height), paint);
-    canvas.drawLine(Offset(0, height), Offset(cornerSize, height), paint);
+    // // Bottom-left corner
+    // canvas.drawLine(Offset(0, height - cornerSize), Offset(0, height), paint);
+    // canvas.drawLine(Offset(0, height), Offset(cornerSize, height), paint);
 
     // Bottom-right corner
-    canvas.drawLine(
-      Offset(width - cornerSize, height),
-      Offset(width, height),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(width, height - cornerSize),
-      Offset(width, height),
-      paint,
-    );
+    // canvas.drawLine(
+    //   Offset(width - cornerSize, height),
+    //   Offset(width, height),
+    //   paint,
+    // );
+    // canvas.drawLine(
+    //   Offset(width, height - cornerSize),
+    //   Offset(width, height),
+    //   paint,
+    // );
   }
 
   @override
