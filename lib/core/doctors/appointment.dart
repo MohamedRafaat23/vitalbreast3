@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:vitalbreast3/core/data/local/cashe_helper.dart';
 import 'package:vitalbreast3/core/data/remote/dio_helper.dart';
+import 'package:vitalbreast3/core/doctors/your_appointment.dart';
 import 'package:vitalbreast3/widgets/context_navigation_extansions.dart';
 import 'package:vitalbreast3/core/models/all.dart';
 import 'package:vitalbreast3/core/doctors/doctor_details.dart';
@@ -37,25 +38,7 @@ class AppointmentScreenState extends State<AppointmentScreen> {
     '4:00 PM'
   ];
 
-  Future<void> _sendAppointment({required String desc}) async {
-    print(user!.id!);
-    final form = FormData.fromMap({
-      'id': user!.id,
-      'desc': desc,
-    });
-
-    final respons = await DioHelper.dio.post(
-      ApiConstant.appointment,
-      data: form,
-    );
-
-    if(respons.statusCode == 201){
-      final appointment = Appointment.Appointment.fromJson(respons.data);
-      print(appointment.desc);
-    }else{
-
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -372,8 +355,8 @@ class AppointmentScreenState extends State<AppointmentScreen> {
         height: 50,
         child: ElevatedButton(
           onPressed: () async {
-            await _sendAppointment(desc: problemController.text.trim());
-          },
+            context.push(AppointmentDetailsScreen());
+           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xffFA7CA5),
             shadowColor: Colors.black,

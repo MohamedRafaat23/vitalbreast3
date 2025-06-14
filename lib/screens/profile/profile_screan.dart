@@ -35,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
        url:  '/accounts/auth/users/me/',
         options: Options(
           headers: {
-            'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
+            'Authorization': 'Bearer${CasheHelper.getData(key: 'token')}',
           },
         ),
       );
@@ -172,11 +172,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 context.push(const AllAppointmentsScreen());
                               },
                             ),
-                            _buildMenuItem(
-                              icon: Icons.lock_outline,
-                              title: 'Password Manager',
-                              onTap: () {},
-                            ),
+                            // _buildMenuItem(
+                            //   icon: Icons.lock_outline,
+                            //   title: 'Password Manager',
+                            //   onTap: () {},
+                            // ),
 
                             Padding(
                               padding: const EdgeInsets.symmetric(

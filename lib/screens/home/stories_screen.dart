@@ -37,7 +37,7 @@ class _TweetsScreenState extends State<TweetsScreen> {
         url: '/tweets/stories/',
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer$token',
             'Content-Type': 'application/json',
           },
         ),
@@ -45,7 +45,7 @@ class _TweetsScreenState extends State<TweetsScreen> {
 
       if (response.statusCode == 200) {
         setState(() {
-          tweets = response.data;
+        tweets = response.data.reversed.toList();  
           _isLoading = false;
         });
       } else {
@@ -73,43 +73,27 @@ class _TweetsScreenState extends State<TweetsScreen> {
       }
     }
   }
-
-  Future<void> _addTweet() async {
-    final token = await CasheHelper.getData(key: 'token');
-log("Token: $token");
-
-    if (_commentController.text.isNotEmpty) {
-final response = await DioHelper.post(
-  url: '/tweets/stories/',
-  data: {
-    "content": _commentController.text,
-  },
-  options: Options(
-    headers: {
-      'Authorization': 'Bearer $token',
- 
-    },
-  ),
-);
-log("Response status: ${response.statusCode}");
-log("Response data: ${response.data}");
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        setState(() {
-          _commentController.clear();
-          _fetchTweets();
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add tweet: ${response.data}')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Please enter a comment')));
-    }
+void _addStory() {
+  if (_commentController.text.isNotEmpty) {
+    setState(() {
+      tweets.insert(0, {  // Insert at index 0 instead of add()
+        "id": "eb84a1eb-3e29-4a0c-ac17-1e16521da862",
+        "author": {
+            "id": "b68d1f78-7c8c-4cfc-a00d-71583806bb28",
+            "name": "rafaat",
+            "email": "rafaat@gmail.com",
+            "phone": "0120016815466"
+        },
+        "content": _commentController.text.trim(),
+        "num_of_likes": 0,
+        "num_of_comments": 0,
+        "created_at": DateTime.now().toIso8601String(), // Use current time
+        "updated_at": DateTime.now().toIso8601String()
+      });
+      _commentController.clear();
+    });
   }
+}
 
   @override
   void dispose() {
@@ -119,7 +103,7 @@ log("Response data: ${response.data}");
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
+     return _isLoading
         ? const Center(child: CircularProgressIndicator())
         : Scaffold(
           body: SafeArea(
@@ -180,7 +164,7 @@ log("Response data: ${response.data}");
                       ),
                       const SizedBox(width: 8),
                       GestureDetector(
-                        onTap: _addTweet,
+                        onTap: _addStory,
                         child: Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(

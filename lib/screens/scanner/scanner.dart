@@ -20,7 +20,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   Map<String, dynamic>? _results;
   bool _showResults = false;
 
-  static const String apiUrl = 'https://c7ee-156-199-124-190.ngrok-free.app';
+  static const String apiUrl = 'https://a499-45-242-23-60.ngrok-free.app/predict';
 
   Future<void> _uploadImage(String imagePath) async {
     if (!mounted) return;
@@ -50,7 +50,34 @@ class _ScannerScreenState extends State<ScannerScreen> {
       if (mounted) {
         if (response.statusCode == 200 || response.statusCode == 201) {
           try {
-            _results = json.decode(response.body);
+            // طباعة معلومات الاستجابة للتشخيص
+            debugPrint('Response Status: ${response.statusCode}');
+            debugPrint('Response Headers: ${response.headers}');
+            debugPrint('Response Body: ${response.body}');
+            debugPrint('Response Body Type: ${response.body.runtimeType}');
+            
+            // التحقق من نوع المحتوى
+            String contentType = response.headers['content-type'] ?? '';
+            
+            if (contentType.contains('application/json')) {
+              // إذا كانت الاستجابة JSON
+              _results = json.decode(response.body);
+            } else {
+              // محاولة تحويل إلى JSON أولاً
+              try {
+                var jsonResponse = json.decode(response.body);
+                _results = jsonResponse;
+              } catch (jsonError) {
+                // إذا فشل التحويل، اعتبر الاستجابة كـ string
+                debugPrint('Response is not JSON, treating as string: ${response.body}');
+                _results = {
+                  'prediction': response.body.trim(),
+                  'confidence': 'N/A',
+                  'format': 'text'
+                };
+              }
+            }
+            
             setState(() {
               _showResults = true;
             });
@@ -154,6 +181,62 @@ class _ScannerScreenState extends State<ScannerScreen> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultsSection() {
+    if (!_showResults || _results == null) return const SizedBox.shrink();
+    
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.green.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.analytics_outlined, 
+                   color: Colors.green.shade700, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Analysis Results',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // عرض النتائج بناءً على النوع
+          if (_results!.containsKey('prediction'))
+            _buildResultItem('Prediction', _results!['prediction'].toString()),
+          
+          if (_results!.containsKey('confidence') && _results!['confidence'] != 'N/A')
+            _buildResultItem('Confidence', 
+                _results!['confidence'] is num 
+                  ? '${(_results!['confidence'] * 100).toStringAsFixed(2)}%'
+                  : _results!['confidence'].toString()),
+          
+          if (_results!.containsKey('class'))
+            _buildResultItem('Class', _results!['class'].toString()),
+          
+          if (_results!.containsKey('error'))
+            _buildResultItem('Error', _results!['error'].toString()),
+          
+          // عرض باقي البيانات
+          ..._results!.entries
+              .where((entry) => !['prediction', 'confidence', 'class', 'error', 'format', 'type'].contains(entry.key))
+              .map((entry) => _buildResultItem(entry.key, entry.value.toString())),
         ],
       ),
     );
@@ -281,56 +364,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
                   const SizedBox(height: 20),
 
-                  // Results Section
-                  if (_showResults && _results != null)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green.shade200),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.analytics_outlined, 
-                                   color: Colors.green.shade700, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Analysis Results',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green.shade700,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          
-                          if (_results!.containsKey('prediction'))
-                            _buildResultItem('Prediction', _results!['prediction'].toString()),
-                          
-                          if (_results!.containsKey('confidence'))
-                            _buildResultItem('Confidence', 
-                                '${(_results!['confidence'] * 100).toStringAsFixed(2)}%'),
-                          
-                          if (_results!.containsKey('class'))
-                            _buildResultItem('Class', _results!['class'].toString()),
-                          
-                          if (_results!.containsKey('error'))
-                            _buildResultItem('Error', _results!['error'].toString()),
-                          
-                          // عرض باقي البيانات
-                          ..._results!.entries
-                              .where((entry) => !['prediction', 'confidence', 'class', 'error'].contains(entry.key))
-                              .map((entry) => _buildResultItem(entry.key, entry.value.toString())),
-                        ],
-                      ),
-                    ),
+                  // Results Section - استخدام الدالة المحسنة
+                  _buildResultsSection(),
 
                   const SizedBox(height: 20),
                 ],

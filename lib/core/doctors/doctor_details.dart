@@ -50,7 +50,7 @@ class DoctorDetailScreen extends StatelessWidget {
                   height: 240,
                   color: Theme.of(context).primaryColor,
                   child: Image.network(
-                    'https://i.pravatar.cc/300?img=${doctor.id.hashCode % 10 + 1}',
+                    'https://img.freepik.com/free-photo/portrait-3d-male-doctor_23-2151107212.jpg?ga=GA1.1.146803951.1749855391&semt=ais_hybrid&w=740',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -60,11 +60,16 @@ class DoctorDetailScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    doctor.name,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  SizedBox(
+                    width:250,
+                    child: Text(
+                      doctor.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   Row(
@@ -79,13 +84,13 @@ class DoctorDetailScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Text(
-                        '($reviewsCount reviews)',
-                        style: const TextStyle(
-                          fontSize: 8,
-                          color: Colors.grey,
-                        ),
-                      ),
+                      // Text(
+                      //   '($reviewsCount reviews)',
+                      //   style: const TextStyle(
+                      //     fontSize: 8,
+                      //     color: Colors.grey,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],

@@ -39,8 +39,8 @@ class _ProfileScreenState extends State<MyProfileScreen> {
   Future<void> _fetchProfileData() async {
     setState(() => _isLoading = true);
     try {
-      final response = await DioHelper.get(
-        url: '/accounts/auth/users/me/',
+      final response = await Dio().get(
+         'http://192.168.1.4:8000/accounts/auth/users/me/',
         options: Options(
           headers: {
             'Authorization': 'Token ${CasheHelper.getData(key: 'token')}',
